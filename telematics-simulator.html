@@ -1,0 +1,3800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#21808d">
+    <meta name="description" content="EG Telematics Simulator - Live GPS, Static Location, and Route-Based simulation">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EG Telematics">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2321808d' width='100' height='100'/%3E%3Ctext y='75' font-size='80' fill='white' font-family='Arial' x='50' text-anchor='middle'%3EEG%3C/text%3E%3C/svg%3E">
+
+    <!-- iOS Meta Tags -->
+    <link rel="apple-touch-icon" href="./icons/icon-180x180.png">
+    <meta name="apple-touch-startup-image" content="./icons/icon-512x512.png">
+
+    <!-- Android/Chrome Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Windows Meta Tags -->
+    <meta name="msapplication-TileImage" content="./icons/icon-512x512.png">
+    <meta name="msapplication-TileColor" content="#21808d">
+    <meta name="msapplication-navbutton-color" content="#21808d">
+
+    <title>EG Telematics Simulator</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+
+            --color-bg-primary: var(--color-cream-50);
+            --color-bg-secondary: var(--color-cream-100);
+            --color-text-primary: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-error: var(--color-red-500);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-focus-ring: rgba(33, 128, 141, 0.4);
+
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: var(--space-16);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 var(--space-24) 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        h2 {
+            margin: var(--space-24) 0 var(--space-16) 0;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: var(--space-8);
+        }
+
+        .tabs {
+            display: flex;
+            gap: var(--space-8);
+            margin-bottom: var(--space-24);
+            border-bottom: 1px solid var(--color-border);
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: var(--space-12) var(--space-16);
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            transition: all 250ms;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-20);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .form-control,
+        textarea {
+            width: 100%;
+            padding: var(--space-12);
+            font-size: 14px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            font-family: inherit;
+        }
+
+        .form-control:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-16);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn {
+            padding: var(--space-12) var(--space-20);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 250ms;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-8);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-gray-200);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-danger {
+            background: var(--color-red-500);
+            color: var(--color-white);
+        }
+
+        .btn-sm {
+            padding: var(--space-8) var(--space-12);
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--space-12);
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .route-item,
+        .waypoint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-12);
+            margin-bottom: var(--space-12);
+        }
+
+        .route-info {
+            flex: 1;
+        }
+
+        .route-name {
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+        }
+
+        .route-meta {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .alert {
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+        }
+
+        .alert-success {
+            background: rgba(33, 128, 141, 0.1);
+            border: 1px solid rgba(33, 128, 141, 0.3);
+            color: var(--color-primary);
+        }
+
+        .alert-error {
+            background: rgba(192, 21, 47, 0.1);
+            border: 1px solid rgba(192, 21, 47, 0.3);
+            color: var(--color-error);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-16);
+        }
+
+        .stat-box {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: var(--space-12);
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                padding: var(--space-8) var(--space-12);
+            }
+        }
+
+        /* Toast notification animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            <svg width="40" height="40" viewBox="0 0 951.56924 959.70989" xmlns="http://www.w3.org/2000/svg" role="img"
+                aria-label="EG Logo" style="vertical-align: middle; margin-right: 1px; display: inline-block;">
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: #ef0304;
+                        }
+
+                        .cls-2 {
+                            fill: #424d60;
+                        }
+                    </style>
+                </defs>
+                <path class="cls-2"
+                    d="M441.93963,448.60428c-17.43729,1.5397-42.56995,4.10273-95.91153,4.10273-63.59988,0-120.02078-10.2584-120.02078-64.11312v-98.98779c0-53.85472,56.93098-63.59988,120.53401-63.59988,53.34158,0,77.96101,2.56302,95.39829,4.10273,6.6689.51323,9.74516,2.04979,9.74516,6.15567v27.18245c0,3.5894-4.10273,6.15557-9.74516,6.15557h-100.01426c-23.59601,0-31.80147,4.61596-31.80147,20.00346v27.18245h127.713c5.64243,0,9.74516,2.56302,9.74516,6.15567v28.20892c0,3.07616-4.10273,6.15557-9.74516,6.15557h-127.713v31.28518c0,15.3875,8.20546,20.00346,31.80147,20.00346h100.01426c5.64243,0,9.74516,3.07941,9.74516,6.15567v27.69559c0,3.59264-3.07626,5.64243-9.74516,6.15567" />
+                <path class="cls-2"
+                    d="M725.5642,517.6219v31.2458c0,3.12321-2.60213,3.6443-6.24972,3.6443h-1.04217c-20.8273-.52108-52.59428-2.08424-89.04444-2.08424h-4.68647c-31.2459,1.04207-51.03413,13.02063-51.03413,49.99187v37.49562c0,40.61883,27.07702,49.99187,47.90762,49.99187,11.97855,0,22.39056,0,32.80586-.52108v-33.85113h-14.05979c-3.6443,0-6.24643-2.60222-6.24643-5.72553v-28.64038c0-3.12641,2.60213-5.72864,6.24643-5.72864h76.5512c4.68666,0,8.33096,2.60222,8.33096,5.72864v99.45964c0,4.36355-2.12276,5.88792-8.33096,6.7709-.78101.11108,0,0-3.6443.52108-22.39385,3.12321-51.55522,5.72864-91.65297,5.72864-48.42871,0-121.33231-19.26725-121.33231-94.25509v-36.97454c0-75.50893,67.69605-94.25509,129.14529-94.25509,42.70007,0,73.42469,4.16538,89.04444,6.77081,4.16868.52108,7.29189,1.56325,7.29189,4.68656" />
+                <rect class="cls-1" x="226.25257" y="506.16452" width="226.00732" height="226.00732" rx="22.60073"
+                    ry="22.60073" />
+                <rect class="cls-1" x="499.5546" y="226.00732" width="226.00732" height="226.00732" rx="22.60073"
+                    ry="22.60073" />
+            </svg>
+            EG Telematics Simulator
+        </h1>
+        <p style="color: var(--color-text-secondary); font-size: 13px; margin: 0 0 var(--space-20) 0;">Live GPS, Static
+            Location, Route-Based simulation with custom route builder, predefined routes, and GeoJSON import</p>
+
+        <!-- Offline Indicator -->
+        <div id="offlineIndicator" class="alert alert-error" style="display: none;">
+            ⚠ You're offline. Pings will be queued and sent when connection is restored.
+        </div>
+
+        <!-- Install PWA Prompt -->
+        <div id="installPrompt" class="card" style="display: none; background: linear-gradient(135deg, rgba(33, 128, 141, 0.1), rgba(50, 184, 198, 0.1)); border: 2px solid var(--color-primary);">
+            <div style="display: flex; align-items: center; gap: var(--space-16); flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <h2 style="margin: 0 0 var(--space-8) 0; font-size: 16px;">📱 Install App</h2>
+                    <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">
+                        Install for offline access, faster loading, and background sync
+                    </p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="installPWA()">⬇ Install</button>
+                    <button class="btn btn-secondary" onclick="dismissInstallPrompt()">Later</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Installed Success Message -->
+        <div id="installedBanner" class="alert alert-success" style="display: none;">
+            ✓ App installed successfully! You can now use it offline.
+        </div>
+
+        <!-- Toast Notification Container -->
+        <div id="toastContainer" style="position: fixed; top: 80px; right: 20px; z-index: 9999; max-width: 400px; display: flex; flex-direction: column; gap: 12px;"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('simulator')">Simulator</button>
+            <button class="tab-btn" onclick="switchTab('routes')">Route Management</button>
+            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
+            <button class="tab-btn" onclick="switchTab('logs')">Logs</button>
+        </div>
+
+        <!-- Simulator Tab -->
+        <div id="simulator" class="tab-content active">
+            <div class="card">
+                <h2>Active Simulation</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Select Vehicle</label>
+                        <select id="vehicleSelect" class="form-control">
+                            <option value="">-- Choose a vehicle --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Simulation Mode</label>
+                        <select id="simMode" class="form-control" onchange="changeModeUI()">
+                            <option value="live">📍 Live GPS (Browser Location)</option>
+                            <option value="static">📌 Static Location (Fixed)</option>
+                            <option value="route">🛣️ Route-Based (Predefined/Custom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="staticModeUI" class="form-group" style="display: none;">
+                    <label class="form-label">Static Location</label>
+                    <div class="form-row">
+                        <input type="number" id="staticLat" class="form-control" placeholder="Latitude" step="0.0001"
+                            value="55.6761">
+                        <input type="number" id="staticLon" class="form-control" placeholder="Longitude" step="0.0001"
+                            value="12.5681">
+                    </div>
+                    <p style="font-size: 12px; color: var(--color-text-secondary); margin-top: var(--space-8);">Default:
+                        Copenhagen Port coordinates</p>
+                </div>
+
+                <div id="routeModeUI" class="form-group" style="display: none;">
+                    <label class="form-label">Select Route</label>
+                    <select id="routeSelect" class="form-control" onchange="updateRoutePreview()">
+                        <option value="">-- Choose a route --</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ping Interval (seconds)</label>
+                        <input type="number" id="pingInterval" class="form-control" value="30" min="1" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quick Presets</label>
+                        <select id="presetInterval" class="form-control" onchange="setPingInterval(this.value)">
+                            <option value="">Custom</option>
+                            <option value="5">5s - Real-time</option>
+                            <option value="15">15s - Fast</option>
+                            <option value="30">30s - Standard</option>
+                            <option value="60">60s - Slow</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: var(--space-20);">
+                    <div class="stat-box">
+                        <div class="stat-label">Current Latitude</div>
+                        <div class="stat-value" style="font-size: 18px;" id="currentLat">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Current Longitude</div>
+                        <div class="stat-value" style="font-size: 18px;" id="currentLon">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Speed (km/h)</div>
+                        <div class="stat-value" id="currentSpeed">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Pings Sent</div>
+                        <div class="stat-value" id="pingCount">0</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="startBtn" onclick="startSimulation()">▶ Start</button>
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopSimulation()" style="display: none;">⏹
+                        Stop</button>
+                    <button class="btn btn-secondary" id="resetBtn" onclick="resetRoute()" style="display: none;">🔄 Reset Route</button>
+                </div>
+            </div>
+
+            <div class="card" id="routePreviewCard" style="display: none;">
+                <h2>Route Preview</h2>
+                <div id="routePreview" style="max-height: 300px; overflow-y: auto; font-size: 13px; line-height: 1.6;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Route Management Tab -->
+        <div id="routes" class="tab-content">
+            <!-- Route Builder Section -->
+            <div class="card">
+                <h2>🛣️ Build Custom Route</h2>
+
+                <div class="form-group">
+                    <label class="form-label">Route Name</label>
+                    <input type="text" id="routeName" class="form-control" placeholder="e.g., Stockholm → Berlin">
+                </div>
+
+                <div class="form-group">
+                    <h3 style="margin: 0 0 var(--space-12) 0; font-size: 14px;">Add Waypoints</h3>
+                    <div class="form-row">
+                        <input type="text" id="wpName" class="form-control" placeholder="Location name">
+                        <input type="text" id="wpCity" class="form-control" placeholder="City">
+                    </div>
+                    <div class="form-row">
+                        <input type="number" id="wpLat" class="form-control" placeholder="Latitude" step="0.0001"
+                            min="-90" max="90">
+                        <input type="number" id="wpLon" class="form-control" placeholder="Longitude" step="0.0001"
+                            min="-180" max="180">
+                    </div>
+                    <div class="form-row">
+                        <input type="number" id="wpSpeed" class="form-control" placeholder="Speed (km/h)" min="0"
+                            max="120" value="30">
+                        <select id="wpType" class="form-control">
+                            <option value="Waypoint">Waypoint</option>
+                            <option value="Port">Port</option>
+                            <option value="Hub">Hub</option>
+                            <option value="Border">Border Crossing</option>
+                        </select>
+                    </div>
+
+                    <!-- Advanced Sensor Properties (Collapsible) -->
+                    <details style="margin-top: var(--space-12); border: 1px solid var(--color-border); border-radius: var(--radius-base); padding: var(--space-12);">
+                        <summary style="cursor: pointer; font-weight: 600; color: var(--color-text); margin-bottom: var(--space-12);">
+                            🔧 Sensor Properties (Optional)
+                        </summary>
+
+                        <!-- Reefer Section -->
+                        <div style="margin-bottom: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Refrigeration</h4>
+                            <div class="form-row">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="wpReeferOn" style="width: auto;">
+                                    <span>Reefer On</span>
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <input type="number" id="wpTemp1" class="form-control" placeholder="Temp Zone 1 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpTemp2" class="form-control" placeholder="Temp Zone 2 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpTemp3" class="form-control" placeholder="Temp Zone 3 (°C)" value="20" min="-30" max="30" step="0.5">
+                            </div>
+                        </div>
+
+                        <!-- Door Section -->
+                        <div style="margin-bottom: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Doors</h4>
+                            <div class="form-row">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="wpDoorOpen" style="width: auto;">
+                                    <span>Door 1 Open</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="wpDoorOpen2" style="width: auto;">
+                                    <span>Door 2 Open</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Coupling Section -->
+                        <div>
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Coupling</h4>
+                            <div class="form-row">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="wpCoupled" checked style="width: auto;">
+                                    <span>Coupled to Tractor</span>
+                                </label>
+                            </div>
+                        </div>
+                    </details>
+
+                    <button class="btn btn-primary" onclick="addWaypoint()" style="margin-top: var(--space-12);">+ Add
+                        Waypoint</button>
+                </div>
+
+                <h3 style="margin: var(--space-20) 0 var(--space-12) 0; font-size: 14px;" id="waypointList">Waypoints
+                    (0)</h3>
+                <div id="waypointContainer"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveCustomRoute()">💾 Save Route</button>
+                    <button class="btn btn-secondary" onclick="clearCustomRoute()">🗑️ Clear All</button>
+                </div>
+            </div>
+
+            <!-- Predefined Routes Section -->
+            <div class="card">
+                <h2>📍 Predefined European Routes</h2>
+                <div id="predefinedRoutesList"></div>
+            </div>
+
+            <!-- GeoJSON Import Section -->
+            <div class="card">
+                <h2>📥 Import from GeoJSON</h2>
+
+                <div class="form-group">
+                    <label class="form-label">GeoJSON Data (FeatureCollection)</label>
+                    <textarea id="geojsonInput"
+                        placeholder="Paste GeoJSON FeatureCollection here or upload .geojson file..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Route Name</label>
+                    <input type="text" id="importRouteName" class="form-control" placeholder="Name for imported route">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="importGeoJSON()">📤 Import Route</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('geojsonFile').click();">📁
+                        Upload File</button>
+                    <input type="file" id="geojsonFile" accept=".geojson,.json" style="display: none;"
+                        onchange="loadGeoJSONFile(event)">
+                </div>
+
+                <div
+                    style="margin-top: var(--space-20); padding: var(--space-16); background: var(--color-bg-primary); border-radius: var(--radius-base); font-size: 12px;">
+                    <strong>Format:</strong> GeoJSON FeatureCollection with Point geometries. Each feature should have
+                    properties: name, country, type (optional), speed (optional).
+                </div>
+
+                <h3 style="margin: var(--space-20) 0 var(--space-12) 0; font-size: 14px;">
+                    📦 Imported GeoJSON Routes (<span id="geojsonRouteCount">0</span>)
+                </h3>
+                <div id="geojsonRoutesList"></div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <h2>Backend Configuration</h2>
+                <div class="form-group">
+                    <label class="form-label">Backend URL</label>
+                    <input type="text" id="backendUrl" class="form-control" placeholder="https://your-api.com/endpoint">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Basic Token</label>
+                    <input type="password" id="bearerToken" class="form-control" placeholder="Enter basic token">
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">✓ Save Settings</button>
+            </div>
+
+            <div class="card">
+                <h2>Manage Vehicles</h2>
+                <div class="form-group">
+                    <h3 style="margin: 0 0 var(--space-12) 0; font-size: 14px;">Add Vehicle</h3>
+                    <div class="form-row">
+                        <input type="text" id="newChassis" class="form-control" placeholder="Chassis (VIN)">
+                        <input type="text" id="newPlate" class="form-control" placeholder="License Plate">
+                    </div>
+                    <div class="form-row">
+                        <input type="text" id="newAssetName" class="form-control" placeholder="Asset Name">
+                        <input type="text" id="newVhId" class="form-control" placeholder="Vehicle ID">
+                    </div>
+                    <button class="btn btn-primary" onclick="addVehicle()" style="margin-top: var(--space-12);">+ Add
+                        Vehicle</button>
+                </div>
+                <h3 style="margin: var(--space-20) 0 var(--space-12) 0; font-size: 14px;">Saved Vehicles</h3>
+                <div id="vehiclesList"></div>
+            </div>
+        </div>
+
+        <!-- Logs Tab -->
+        <div id="logs" class="tab-content">
+            <div class="card">
+                <h2>Transmission Logs</h2>
+                <button class="btn btn-secondary" onclick="clearLogs()" style="margin-bottom: var(--space-16);">🗑 Clear
+                    Logs</button>
+                <div id="logsContent"
+                    style="background: var(--color-charcoal-700); color: var(--color-gray-200); border-radius: var(--radius-base); padding: var(--space-16); font-family: 'Courier New', monospace; font-size: 12px; max-height: 400px; overflow-y: auto;">
+                    <div style="color: var(--color-text-secondary);">Waiting for simulation to start...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // PERFORMANCE UTILITIES
+        // ========================================
+        
+        // Debounce function to prevent excessive re-renders
+        function debounce(func, wait = 150) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Throttle function for high-frequency events
+        function throttle(func, limit = 100) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
+
+        // Batch DOM updates using requestAnimationFrame
+        let rafId = null;
+        const pendingUpdates = new Set();
+        
+        function scheduleUpdate(updateFn) {
+            pendingUpdates.add(updateFn);
+            
+            if (!rafId) {
+                rafId = requestAnimationFrame(() => {
+                    const updates = Array.from(pendingUpdates);
+                    pendingUpdates.clear();
+                    rafId = null;
+                    
+                    // Execute all pending updates in one frame
+                    updates.forEach(fn => {
+                        try {
+                            fn();
+                        } catch (error) {
+                            console.error('Update error:', error);
+                        }
+                    });
+                });
+            }
+        }
+
+        // Performance monitoring
+        const perfMarks = {};
+        
+        function perfStart(label) {
+            perfMarks[label] = performance.now();
+        }
+        
+        function perfEnd(label) {
+            if (perfMarks[label]) {
+                const duration = performance.now() - perfMarks[label];
+                if (duration > 100) {
+                    console.warn(`⚠️ Slow operation: ${label} took ${duration.toFixed(2)}ms`);
+                }
+                delete perfMarks[label];
+                return duration;
+            }
+        }
+
+        // Web Worker for unthrottled background pinging
+        const workerCode = `
+            let intervalId = null;
+
+            self.addEventListener('message', (e) => {
+                if (e.data.type === 'START') {
+                    clearInterval(intervalId);
+                    intervalId = setInterval(() => {
+                        self.postMessage({ type: 'PING' });
+                    }, e.data.interval);
+                } else if (e.data.type === 'STOP') {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            });
+        `;
+
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(blob);
+        let pingWorker = null;
+
+        // PWA Installation
+        let deferredInstallPrompt = null;
+        let isAppInstalled = false;
+
+        window.addEventListener('load', () => {
+            // Check if running as installed PWA
+            if (window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true) {
+                isAppInstalled = true;
+                console.log('Running as installed PWA');
+            }
+
+            // Check if previously dismissed (expires after 7 days)
+            const dismissedTime = localStorage.getItem('installPromptDismissed');
+            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+            if (dismissedTime && parseInt(dismissedTime) > sevenDaysAgo) {
+                console.log('Install prompt recently dismissed');
+                return;
+            }
+        });
+
+        // Capture install prompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt fired');
+
+            // Prevent default mini-infobar on mobile
+            e.preventDefault();
+
+            // Store event for later use
+            deferredInstallPrompt = e;
+
+            // Show custom install button (only if not installed)
+            if (!isAppInstalled) {
+                document.getElementById('installPrompt').style.display = 'block';
+                addLog('📱 App can be installed for offline use', 'info');
+            }
+        });
+
+        // Handle install button click
+        async function installPWA() {
+            if (!deferredInstallPrompt) {
+                addLog('⚠ Installation not available', 'error');
+                return;
+            }
+
+            // Show browser install prompt
+            deferredInstallPrompt.prompt();
+
+            // Wait for user choice
+            const { outcome } = await deferredInstallPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                addLog('✓ App installation accepted', 'success');
+                document.getElementById('installPrompt').style.display = 'none';
+                document.getElementById('installedBanner').style.display = 'block';
+
+                // Hide success banner after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('installedBanner').style.display = 'none';
+                }, 5000);
+            } else {
+                addLog('ℹ️ App installation declined', 'info');
+            }
+
+            // Clear the prompt
+            deferredInstallPrompt = null;
+        }
+
+        // Handle dismiss button
+        function dismissInstallPrompt() {
+            document.getElementById('installPrompt').style.display = 'none';
+            localStorage.setItem('installPromptDismissed', Date.now().toString());
+            addLog('ℹ️ Install prompt dismissed (will show again in 7 days)', 'info');
+        }
+
+        // Detect successful installation
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed successfully');
+            isAppInstalled = true;
+            document.getElementById('installPrompt').style.display = 'none';
+            document.getElementById('installedBanner').style.display = 'block';
+            addLog('✓ App installed! Accessible from home screen', 'success');
+
+            // Hide banner after 5 seconds
+            setTimeout(() => {
+                document.getElementById('installedBanner').style.display = 'none';
+            }, 5000);
+        });
+
+        // State
+        let state = {
+            isRunning: false,
+            intervalId: null,
+            pingCount: 0,
+            currentWaypointIdx: 0,
+            currentRoute: null,
+            customWaypoints: [],
+            simMode: 'route',
+            currentLat: 55.6761,
+            currentLon: 12.5681,
+            currentSpeed: 0,
+            backendUrl: localStorage.getItem('backendUrl') || 'https://telematics-service.aspect4-dev.aksdev.egdev.eu/kroneTelematics/transportation',
+            bearerToken: localStorage.getItem('bearerToken') || '',
+            vehicles: JSON.parse(localStorage.getItem('vehicles') || '[]') || [
+                { chassis: 'WKESD000001040923', plate: 'DK-AB123', assetName: 'KRONE-1', vhId: 'HD305081' },
+                { chassis: 'WKESD000001040924', plate: 'DK-CD456', assetName: 'KRONE-2', vhId: 'HD305082' }
+            ],
+            routes: {},
+            sessions: JSON.parse(localStorage.getItem('simulationSessions') || '{}'),
+            // Edit mode state
+            editingRoute: null,          // Route key being edited (null = not editing)
+            editingWaypointIdx: null,    // Waypoint index being edited (null = not editing)
+            pendingRouteChanges: null,   // Deep copy of route for editing (uncommitted changes)
+            isEditMode: false,           // Boolean flag for UI state
+            wasPausedForEdit: false,     // Track if simulation was paused for editing
+            insertingAfterIdx: null,     // Track which waypoint is getting a new waypoint inserted after it
+            expandedGeoJSONRoute: null,   // Track expanded route in Route Management tab
+            expandedRouteRenderState: null,  // Track rendering state for expanded routes (currentEnd, routeKey)
+            deletedWaypointsStack: []    // Track deleted waypoints for undo functionality (array of {waypoint, index})
+        };
+
+        // Offline/Online detection
+        let isOnline = navigator.onLine;
+        let failedPingsQueue = JSON.parse(localStorage.getItem('failedPingsQueue') || '[]');
+
+        window.addEventListener('online', () => {
+            isOnline = true;
+            document.getElementById('offlineIndicator').style.display = 'none';
+            addLog('✓ Back online - syncing queued pings', 'success');
+            syncFailedPings();
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            document.getElementById('offlineIndicator').style.display = 'block';
+            addLog('⚠ You are offline - pings will be queued', 'error');
+        });
+
+        // Check initial state
+        if (!isOnline) {
+            document.getElementById('offlineIndicator').style.display = 'block';
+        }
+
+        // Predefined European routes
+        const predefinedRoutes = {
+            'copenhagen_hamburg': {
+                name: 'Copenhagen → Hamburg (North Sea Corridor)',
+                distance: 420,
+                waypoints: [
+                    {
+                        name: 'Copenhagen Port', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0,
+                        // Loading scenario: doors open, reefer starting
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 18, temp2: 18, temp3: 18, coupled: true
+                    },
+                    {
+                        name: 'Roskilde', country: 'Denmark', lat: 55.6419, lon: 12.0820, speed: 30,
+                        // En route: doors closed, reefer cooling
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 5, temp2: 5, temp3: 5, coupled: true
+                    },
+                    {
+                        name: 'Kolding', country: 'Denmark', lat: 55.4784, lon: 9.4922, speed: 45,
+                        // En route: optimal temps reached
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true
+                    },
+                    {
+                        name: 'Flensburg', country: 'Germany', lat: 54.7688, lon: 9.4342, speed: 50,
+                        // Border crossing: stopped for inspection, one door open
+                        doorOpen: true, doorOpen2: false, reeferOn: true, temp1: 3, temp2: 3, temp3: 3, coupled: true
+                    },
+                    {
+                        name: 'Kiel', country: 'Germany', lat: 54.3233, lon: 10.1350, speed: 55,
+                        // En route: stable temps
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true
+                    },
+                    {
+                        name: 'Lübeck Port', country: 'Germany', lat: 53.8705, lon: 10.8734, speed: 40,
+                        // En route: stable temps
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true
+                    },
+                    {
+                        name: 'Hamburg Port', country: 'Germany', lat: 53.5461, lon: 9.9922, speed: 20,
+                        // Destination: unloading, doors open
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 4, temp2: 4, temp3: 4, coupled: true
+                    }
+                ]
+            },
+            'copenhagen_warsaw': {
+                name: 'Copenhagen → Warsaw (Eastern Europe)',
+                distance: 850,
+                waypoints: [
+                    {
+                        name: 'Copenhagen', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0,
+                        // Loading: non-refrigerated cargo, doors open
+                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                    },
+                    {
+                        name: 'Odense', country: 'Denmark', lat: 55.4015, lon: 10.3918, speed: 30,
+                        // En route: doors closed, ambient temp
+                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                    },
+                    {
+                        name: 'Malmö', country: 'Sweden', lat: 55.6050, lon: 13.0061, speed: 40,
+                        // Ferry crossing: stable
+                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                    },
+                    {
+                        name: 'Stockholm', country: 'Sweden', lat: 59.3293, lon: 18.0686, speed: 45,
+                        // Rest stop: one door open for inspection
+                        doorOpen: true, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                    },
+                    {
+                        name: 'Gdańsk', country: 'Poland', lat: 54.3720, lon: 18.6466, speed: 50,
+                        // En route: doors closed
+                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                    },
+                    {
+                        name: 'Warsaw', country: 'Poland', lat: 52.2297, lon: 21.0122, speed: 30,
+                        // Destination: unloading, both doors open
+                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                    }
+                ]
+            },
+            'bremen_munich': {
+                name: 'Bremen → Munich (Central Europe)',
+                distance: 680,
+                waypoints: [
+                    {
+                        name: 'Bremen Port', country: 'Germany', lat: 53.1050, lon: 8.8074, speed: 0,
+                        // Loading: multi-zone refrigerated cargo, doors open
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -5, temp2: 15, temp3: 2, coupled: true
+                    },
+                    {
+                        name: 'Hannover', country: 'Germany', lat: 52.3744, lon: 9.7318, speed: 40,
+                        // En route: doors closed, maintaining different zone temps
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -8, temp2: 12, temp3: 0, coupled: true
+                    },
+                    {
+                        name: 'Frankfurt', country: 'Germany', lat: 50.1109, lon: 8.6821, speed: 50,
+                        // En route: stable multi-zone temps
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true
+                    },
+                    {
+                        name: 'Nürnberg', country: 'Germany', lat: 49.4521, lon: 11.0767, speed: 55,
+                        // En route: maintaining temps
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true
+                    },
+                    {
+                        name: 'Munich', country: 'Germany', lat: 48.1351, lon: 11.5820, speed: 30,
+                        // Destination: unloading, doors open, temps rising slightly
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -7, temp2: 12, temp3: 0, coupled: true
+                    }
+                ]
+            }
+        };
+
+        // Session Management - Store state per vehicle+route
+        function getSessionKey(vehicleIdx, routeKey) {
+            const vehicle = state.vehicles[vehicleIdx];
+            return `${vehicle.vhId}_${routeKey}`;
+        }
+
+        function saveSession(vehicleIdx, routeKey) {
+            if (state.simMode !== 'route' || !routeKey) return;
+            
+            const sessionKey = getSessionKey(vehicleIdx, routeKey);
+            state.sessions[sessionKey] = {
+                vehicleIdx: parseInt(vehicleIdx),
+                routeKey,
+                currentWaypointIdx: state.currentWaypointIdx,
+                pingCount: state.pingCount,
+                lastUpdated: new Date().toISOString()
+            };
+            localStorage.setItem('simulationSessions', JSON.stringify(state.sessions));
+        }
+
+        function loadSession(vehicleIdx, routeKey) {
+            if (state.simMode !== 'route' || !routeKey) return false;
+            
+            const sessionKey = getSessionKey(vehicleIdx, routeKey);
+            const session = state.sessions[sessionKey];
+            
+            if (session) {
+                state.currentWaypointIdx = session.currentWaypointIdx || 0;
+                state.pingCount = session.pingCount || 0;
+                document.getElementById('pingCount').textContent = state.pingCount;
+                
+                // Update location display if we have waypoints
+                if (state.currentRoute && state.currentRoute.waypoints.length > 0) {
+                    const wp = state.currentRoute.waypoints[state.currentWaypointIdx % state.currentRoute.waypoints.length];
+                    state.currentLat = wp.lat;
+                    state.currentLon = wp.lon;
+                    state.currentSpeed = wp.speed;
+                    updateLocationDisplay();
+                }
+                
+                return true;
+            }
+            return false;
+        }
+
+        function clearSession(vehicleIdx, routeKey) {
+            if (!vehicleIdx || !routeKey) return;
+            
+            const sessionKey = getSessionKey(vehicleIdx, routeKey);
+            delete state.sessions[sessionKey];
+            localStorage.setItem('simulationSessions', JSON.stringify(state.sessions));
+        }
+
+        function restoreLastSession() {
+            // Find the most recent session
+            const sessions = Object.values(state.sessions);
+            if (sessions.length === 0) return;
+            
+            const latestSession = sessions.reduce((latest, current) => {
+                return new Date(current.lastUpdated) > new Date(latest.lastUpdated) ? current : latest;
+            });
+            
+            // Restore UI state
+            document.getElementById('vehicleSelect').value = latestSession.vehicleIdx;
+            document.getElementById('simMode').value = 'route';
+            changeModeUI();
+            
+            // Set route
+            document.getElementById('routeSelect').value = latestSession.routeKey;
+            updateRoutePreview();
+            
+            // Load session data
+            loadSession(latestSession.vehicleIdx, latestSession.routeKey);
+            
+            const vehicle = state.vehicles[latestSession.vehicleIdx];
+            const route = state.routes[latestSession.routeKey] || predefinedRoutes[latestSession.routeKey];
+            addLog(`🔄 Restored session: ${vehicle.assetName} on ${route.name} (Waypoint ${state.currentWaypointIdx + 1}, ${state.pingCount} pings)`, 'info');
+        }
+
+        // Migrate existing routes to add metadata (backward compatibility)
+        function migrateRoutesMetadata() {
+            let needsSave = false;
+
+            Object.entries(state.routes).forEach(([key, route]) => {
+                if (!route.source) {
+                    route.source = 'builder';  // Default to builder for existing custom routes
+                    needsSave = true;
+                }
+            });
+
+            if (needsSave) {
+                localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+                addLog('✓ Route metadata migrated', 'info');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadSettings();
+            renderVehiclesList();
+            updateVehicleSelect();
+            updateRouteSelect();
+            renderPredefinedRoutes();
+            state.routes = JSON.parse(localStorage.getItem('customRoutes') || '{}');
+
+            // Migrate existing routes to add metadata
+            migrateRoutesMetadata();
+
+            // Render GeoJSON routes list
+            if (typeof renderGeoJSONRoutes === 'function') {
+                renderGeoJSONRoutes();
+            }
+
+            updateRouteSelect();
+            requestLocationPermission();
+            changeModeUI();
+
+            // Restore last session if available
+            restoreLastSession();
+            
+            // Setup event delegation for better performance
+            setupEventDelegation();
+        });
+
+        // Event delegation setup
+        function setupEventDelegation() {
+            // Delegate all button clicks from waypoint container
+            document.getElementById('waypointContainer')?.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                
+                const action = btn.dataset.action;
+                const index = parseInt(btn.dataset.index);
+                
+                if (action === 'remove-waypoint') {
+                    removeWaypoint(index);
+                }
+            });
+            
+            // Delegate all button clicks from GeoJSON routes
+            document.getElementById('geojsonRoutesList')?.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                
+                const action = btn.dataset.action;
+                const key = btn.dataset.key;
+                
+                switch (action) {
+                    case 'use-geojson-route':
+                        useGeoJSONRoute(key);
+                        break;
+                    case 'edit-geojson-route':
+                        editGeoJSONRoute(key);
+                        break;
+                    case 'add-waypoints-to-route':
+                        addWaypointsToRoute(key);
+                        break;
+                    case 'delete-geojson-route':
+                        deleteGeoJSONRoute(key);
+                        break;
+                }
+            });
+            
+            // Delegate all button clicks from route preview
+            document.getElementById('routePreview')?.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                
+                const action = btn.dataset.action;
+                const index = parseInt(btn.dataset.index);
+                
+                switch (action) {
+                    case 'edit-waypoint':
+                        editWaypoint(index);
+                        break;
+                    case 'insert-waypoint-before':
+                        insertWaypointBefore(index);
+                        break;
+                    case 'insert-waypoint-after':
+                        insertWaypointAfter(index);
+                        break;
+                    case 'delete-waypoint':
+                        deleteWaypoint(index);
+                        break;
+                }
+            });
+        }
+
+        // Monitor tab visibility and warn about throttling
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && state.isRunning) {
+                addLog('ℹ️ Tab is in background - Web Worker active, pings will continue at set interval', 'info');
+            } else if (!document.hidden && state.isRunning) {
+                addLog('✓ Tab is active - pings running normally', 'success');
+            }
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function changeModeUI() {
+            state.simMode = document.getElementById('simMode').value;
+            document.getElementById('staticModeUI').style.display = state.simMode === 'static' ? 'block' : 'none';
+            document.getElementById('routeModeUI').style.display = state.simMode === 'route' ? 'block' : 'none';
+            document.getElementById('routePreviewCard').style.display = state.simMode === 'route' ? 'block' : 'none';
+            document.getElementById('resetBtn').style.display = state.simMode === 'route' ? 'inline-flex' : 'none';
+            updateLocationDisplay();
+        }
+
+        function requestLocationPermission() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        state.currentLat = pos.coords.latitude;
+                        state.currentLon = pos.coords.longitude;
+                        state.currentSpeed = (pos.coords.speed || 0) * 3.6;
+                        updateLocationDisplay();
+                    },
+                    err => addLog(`⚠ Location access: ${err.message}`, 'info')
+                );
+            }
+        }
+
+        function updateLocationDisplay() {
+            document.getElementById('currentLat').textContent = state.currentLat.toFixed(4);
+            document.getElementById('currentLon').textContent = state.currentLon.toFixed(4);
+            document.getElementById('currentSpeed').textContent = Math.round(state.currentSpeed);
+        }
+
+        // Vehicle Selection
+        function updateVehicleSelect() {
+            const select = document.getElementById('vehicleSelect');
+            const current = select.value;
+
+            let options = '<option value="">-- Choose a vehicle --</option>';
+            state.vehicles.forEach((v, idx) => {
+                options += `<option value="${idx}">${v.assetName} (${v.plate})</option>`;
+            });
+
+            select.innerHTML = options;
+            if (current) select.value = current;
+        }
+
+        // Route Builder Functions
+        function addWaypoint() {
+            perfStart('addWaypoint');
+            
+            const name = document.getElementById('wpName').value.trim();
+            const city = document.getElementById('wpCity').value.trim();
+            const lat = parseFloat(document.getElementById('wpLat').value);
+            const lon = parseFloat(document.getElementById('wpLon').value);
+            const speed = parseInt(document.getElementById('wpSpeed').value) || 30;
+            const type = document.getElementById('wpType').value;
+
+            // Capture sensor properties
+            const reeferOn = document.getElementById('wpReeferOn').checked;
+            const temp1 = parseFloat(document.getElementById('wpTemp1').value) || 20;
+            const temp2 = parseFloat(document.getElementById('wpTemp2').value) || 20;
+            const temp3 = parseFloat(document.getElementById('wpTemp3').value) || 20;
+            const doorOpen = document.getElementById('wpDoorOpen').checked;
+            const doorOpen2 = document.getElementById('wpDoorOpen2').checked;
+            const coupled = document.getElementById('wpCoupled').checked;
+
+            // Clear previous validation states
+            document.getElementById('wpName').style.borderColor = '';
+            document.getElementById('wpLat').style.borderColor = '';
+            document.getElementById('wpLon').style.borderColor = '';
+
+            let hasError = false;
+
+            if (!name) {
+                document.getElementById('wpName').style.borderColor = 'var(--color-error)';
+                document.getElementById('wpName').focus();
+                hasError = true;
+            }
+
+            if (isNaN(lat)) {
+                document.getElementById('wpLat').style.borderColor = 'var(--color-error)';
+                if (!hasError) document.getElementById('wpLat').focus();
+                hasError = true;
+            }
+
+            if (isNaN(lon)) {
+                document.getElementById('wpLon').style.borderColor = 'var(--color-error)';
+                if (!hasError) document.getElementById('wpLon').focus();
+                hasError = true;
+            }
+
+            if (hasError) {
+                addLog('⚠ Fill in all required waypoint fields (Name, Latitude, Longitude)', 'error');
+                perfEnd('addWaypoint');
+                return;
+            }
+
+            const newWaypoint = {
+                name,
+                city,
+                country: city || 'Unknown',
+                lat,
+                lon,
+                speed,
+                type,
+                // Sensor properties
+                reeferOn,
+                temp1,
+                temp2,
+                temp3,
+                doorOpen,
+                doorOpen2,
+                coupled
+            };
+
+            state.customWaypoints.push(newWaypoint);
+            
+            const container = document.getElementById('waypointContainer');
+            const currentCount = state.customWaypoints.length;
+            
+            // Update count
+            document.getElementById('waypointList').textContent = `Waypoints (${currentCount})`;
+            
+            // Initialize render state if not exists
+            if (!window.waypointRenderState) {
+                window.waypointRenderState = { currentEnd: 50 };
+            }
+            
+            // OPTIMIZED: Only append new waypoint instead of re-rendering all
+            // Only add to DOM if it's within visible range
+            if (currentCount <= window.waypointRenderState.currentEnd) {
+                const idx = currentCount - 1;
+                const sensors = [];
+                if (newWaypoint.reeferOn) sensors.push('❄️ Reefer');
+                if (newWaypoint.doorOpen) sensors.push('🚪 Door1');
+                if (newWaypoint.doorOpen2) sensors.push('🚪 Door2');
+                if (newWaypoint.coupled === false) sensors.push('⚠️ Uncoupled');
+                if (newWaypoint.reeferOn && (newWaypoint.temp1 !== 20 || newWaypoint.temp2 !== 20 || newWaypoint.temp3 !== 20)) {
+                    sensors.push(`🌡️ ${newWaypoint.temp1}°/${newWaypoint.temp2}°/${newWaypoint.temp3}°C`);
+                }
+
+                const sensorBadge = sensors.length > 0
+                    ? `<div style="margin-top: 4px; font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</div>`
+                    : '';
+
+                const newItem = document.createElement('div');
+                newItem.className = 'waypoint-item';
+                newItem.innerHTML = `
+                    <div class="route-info">
+                        <div class="route-name">${idx + 1}. ${newWaypoint.name}</div>
+                        <div class="route-meta">${newWaypoint.city}, ${newWaypoint.type} • ${newWaypoint.lat.toFixed(4)}, ${newWaypoint.lon.toFixed(4)} • ${newWaypoint.speed} km/h</div>
+                        ${sensorBadge}
+                    </div>
+                    <button class="btn btn-danger btn-sm" data-action="remove-waypoint" data-index="${idx}">✕</button>
+                `;
+                
+                // Insert before "Load More" button if it exists
+                const loadMoreBtn = container.querySelector('button[onclick="loadMoreCustomWaypoints()"]');
+                if (loadMoreBtn) {
+                    loadMoreBtn.parentElement.parentNode.insertBefore(newItem, loadMoreBtn.parentElement);
+                } else {
+                    container.appendChild(newItem);
+                }
+            } else {
+                // If beyond visible range, just update the "Load More" button text
+                const loadMoreBtn = container.querySelector('button[onclick="loadMoreCustomWaypoints()"]');
+                if (loadMoreBtn) {
+                    const remaining = currentCount - window.waypointRenderState.currentEnd;
+                    loadMoreBtn.innerHTML = `📜 Load More Waypoints (${remaining} remaining)`;
+                }
+            }
+            
+            // Clear form
+            document.getElementById('wpName').value = '';
+            document.getElementById('wpCity').value = '';
+            document.getElementById('wpLat').value = '';
+            document.getElementById('wpLon').value = '';
+            document.getElementById('wpSpeed').value = '30';
+
+            // Clear sensor fields (reset to defaults)
+            document.getElementById('wpReeferOn').checked = false;
+            document.getElementById('wpTemp1').value = '20';
+            document.getElementById('wpTemp2').value = '20';
+            document.getElementById('wpTemp3').value = '20';
+            document.getElementById('wpDoorOpen').checked = false;
+            document.getElementById('wpDoorOpen2').checked = false;
+            document.getElementById('wpCoupled').checked = true;
+
+            addLog(`✓ Waypoint added: ${name} (${currentCount} total)`, 'success');
+            perfEnd('addWaypoint');
+        }
+
+        function renderCustomWaypoints() {
+            perfStart('renderCustomWaypoints');
+            
+            const container = document.getElementById('waypointContainer');
+            const totalWaypoints = state.customWaypoints.length;
+            document.getElementById('waypointList').textContent = `Waypoints (${totalWaypoints})`;
+
+            if (totalWaypoints === 0) {
+                container.innerHTML = '<p style="color: var(--color-text-secondary); font-size: 13px;">No waypoints yet. Add one above.</p>';
+                perfEnd('renderCustomWaypoints');
+                return;
+            }
+
+            // VIRTUAL SCROLLING: Only render visible waypoints + buffer
+            const CHUNK_SIZE = 50; // Show 50 at a time
+            
+            // Initialize render state if not exists
+            if (!window.waypointRenderState) {
+                window.waypointRenderState = { currentEnd: Math.min(CHUNK_SIZE, totalWaypoints) };
+            }
+            
+            const currentEnd = window.waypointRenderState.currentEnd;
+            
+            // Build HTML in chunks to avoid blocking
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+            
+            const html = state.customWaypoints.slice(0, currentEnd).map((wp, idx) => {
+                // Build sensor status indicators (only show if non-default)
+                const sensors = [];
+                if (wp.reeferOn) sensors.push('❄️ Reefer');
+                if (wp.doorOpen) sensors.push('🚪 Door1');
+                if (wp.doorOpen2) sensors.push('🚪 Door2');
+                if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
+                if (wp.reeferOn && (wp.temp1 !== 20 || wp.temp2 !== 20 || wp.temp3 !== 20)) {
+                    sensors.push(`🌡️ ${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`);
+                }
+
+                const sensorBadge = sensors.length > 0
+                    ? `<div style="margin-top: 4px; font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</div>`
+                    : '';
+
+                return `
+                    <div class="waypoint-item">
+                        <div class="route-info">
+                            <div class="route-name">${idx + 1}. ${wp.name}</div>
+                            <div class="route-meta">${wp.city}, ${wp.type} • ${wp.lat.toFixed(4)}, ${wp.lon.toFixed(4)} • ${wp.speed} km/h</div>
+                            ${sensorBadge}
+                        </div>
+                        <button class="btn btn-danger btn-sm" data-action="remove-waypoint" data-index="${idx}">✕</button>
+                    </div>
+                `;
+            }).join('');
+
+            tempDiv.innerHTML = html;
+            while (tempDiv.firstChild) {
+                fragment.appendChild(tempDiv.firstChild);
+            }
+            
+            container.innerHTML = '';
+            container.appendChild(fragment);
+            
+            // Add "Load More" button if there are more waypoints
+            if (currentEnd < totalWaypoints) {
+                const loadMoreDiv = document.createElement('div');
+                loadMoreDiv.style.cssText = 'padding: 16px; text-align: center;';
+                loadMoreDiv.innerHTML = `
+                    <button class="btn btn-secondary" onclick="loadMoreCustomWaypoints()">
+                        📜 Load More Waypoints (${totalWaypoints - currentEnd} remaining)
+                    </button>
+                `;
+                container.appendChild(loadMoreDiv);
+            }
+            
+            perfEnd('renderCustomWaypoints');
+        }
+
+        // Load more waypoints in Route Builder
+        function loadMoreCustomWaypoints() {
+            perfStart('loadMoreCustomWaypoints');
+            
+            const CHUNK_SIZE = 50;
+            const totalWaypoints = state.customWaypoints.length;
+            
+            if (!window.waypointRenderState) {
+                window.waypointRenderState = { currentEnd: CHUNK_SIZE };
+            }
+            
+            window.waypointRenderState.currentEnd = Math.min(
+                window.waypointRenderState.currentEnd + CHUNK_SIZE,
+                totalWaypoints
+            );
+            
+            renderCustomWaypoints();
+            perfEnd('loadMoreCustomWaypoints');
+        }
+
+        function removeWaypoint(idx) {
+            state.customWaypoints.splice(idx, 1);
+            scheduleUpdate(() => renderCustomWaypoints());
+        }
+
+        function saveCustomRoute() {
+            const name = document.getElementById('routeName').value.trim();
+            const routeNameInput = document.getElementById('routeName');
+            
+            // Clear previous validation
+            routeNameInput.style.borderColor = '';
+
+            if (!name) {
+                routeNameInput.style.borderColor = 'var(--color-error)';
+                routeNameInput.focus();
+                addLog('⚠ Route name is required', 'error');
+                return;
+            }
+
+            if (state.customWaypoints.length < 2) {
+                addLog('⚠ Route needs at least 2 waypoints', 'error');
+                return;
+            }
+
+            const routeId = name.toLowerCase().replace(/\s+/g, '_');
+            state.routes[routeId] = {
+                name,
+                waypoints: JSON.parse(JSON.stringify(state.customWaypoints)),
+                distance: calculateDistance(state.customWaypoints),
+                source: 'builder'               // NEW: Track source as builder
+            };
+
+            localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+            updateRouteSelect();
+            addLog(`✓ Route "${name}" saved`, 'success');
+            clearCustomRoute();
+        }
+
+        function clearCustomRoute() {
+            state.customWaypoints = [];
+            document.getElementById('routeName').value = '';
+            // Reset render state for virtual scrolling
+            window.waypointRenderState = { currentEnd: 50 };
+            renderCustomWaypoints();
+        }
+
+        // GeoJSON Import
+        function importGeoJSON() {
+            let json = document.getElementById('geojsonInput').value.trim();
+            const name = document.getElementById('importRouteName').value.trim();
+            
+            const geojsonInput = document.getElementById('geojsonInput');
+            const importRouteName = document.getElementById('importRouteName');
+            
+            // Clear previous validation
+            geojsonInput.style.borderColor = '';
+            importRouteName.style.borderColor = '';
+
+            let hasError = false;
+
+            if (!json) {
+                geojsonInput.style.borderColor = 'var(--color-error)';
+                geojsonInput.focus();
+                hasError = true;
+            }
+
+            if (!name) {
+                importRouteName.style.borderColor = 'var(--color-error)';
+                if (!hasError) importRouteName.focus();
+                hasError = true;
+            }
+
+            if (hasError) {
+                addLog('⚠ Provide both GeoJSON data and route name', 'error');
+                return;
+            }
+
+            try {
+                // Remove BOM if present
+                json = json.replace(/^\uFEFF/, '');
+                
+                // Handle escaped JSON (if user pastes \"type\" instead of "type")
+                // Check if it starts with escaped quote
+                if (json.startsWith('\\"') || json.startsWith('{\\')) {
+                    json = json.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                }
+                
+                // Try to parse JSON
+                const data = JSON.parse(json);
+                let waypoints = [];
+
+                // Handle array of {latitude, longitude} objects
+                if (Array.isArray(data) && data.length > 0 && data[0].latitude !== undefined && data[0].longitude !== undefined) {
+                    waypoints = data.map((point, idx) => ({
+                        name: `Waypoint ${idx + 1}`,
+                        city: '',
+                        country: 'Unknown',
+                        lat: point.latitude,
+                        lon: point.longitude,
+                        speed: 30,
+                        type: 'Waypoint'
+                    }));
+                }
+                // Handle FeatureCollection (Point geometries)
+                else if (data.type === 'FeatureCollection' && data.features) {
+                    waypoints = data.features.map(f => ({
+                        name: f.properties?.name || 'Unknown',
+                        city: f.properties?.city || f.properties?.name || '',
+                        country: f.properties?.country || f.properties?.city || 'Unknown',
+                        lat: f.geometry.coordinates[1],
+                        lon: f.geometry.coordinates[0],
+                        speed: f.properties?.speed || 30,
+                        type: f.properties?.type || 'Waypoint',
+                        // Map sensor properties from GeoJSON (support both camelCase and snake_case)
+                        reeferOn: f.properties?.reeferOn !== undefined ? f.properties.reeferOn :
+                                  (f.properties?.BD_REEFER_ON !== undefined ? f.properties.BD_REEFER_ON : false),
+                        temp1: f.properties?.temp1 !== undefined ? f.properties.temp1 :
+                               (f.properties?.BD_TEMP1 !== undefined ? f.properties.BD_TEMP1 : 20),
+                        temp2: f.properties?.temp2 !== undefined ? f.properties.temp2 :
+                               (f.properties?.BD_TEMP2 !== undefined ? f.properties.BD_TEMP2 : 20),
+                        temp3: f.properties?.temp3 !== undefined ? f.properties.temp3 :
+                               (f.properties?.BD_TEMP3 !== undefined ? f.properties.BD_TEMP3 : 20),
+                        doorOpen: f.properties?.doorOpen !== undefined ? f.properties.doorOpen :
+                                  (f.properties?.BD_DOOR_OPEN !== undefined ? f.properties.BD_DOOR_OPEN : false),
+                        doorOpen2: f.properties?.doorOpen2 !== undefined ? f.properties.doorOpen2 :
+                                   (f.properties?.BD_DOOR_OPEN_2 !== undefined ? f.properties.BD_DOOR_OPEN_2 : false),
+                        coupled: f.properties?.coupled !== undefined ? f.properties.coupled :
+                                 (f.properties?.BD_COUPLED !== undefined ? f.properties.BD_COUPLED : true)
+                    }));
+                }
+                // Handle LineString geometry (direct object)
+                else if (data.type === 'LineString' && Array.isArray(data.coordinates)) {
+                    waypoints = data.coordinates.map((coord, idx) => ({
+                        name: `Waypoint ${idx + 1}`,
+                        city: '',
+                        country: 'Unknown',
+                        lat: coord[1],  // GeoJSON uses [lon, lat]
+                        lon: coord[0],
+                        speed: 30,
+                        type: 'Waypoint'
+                    }));
+                }
+                // Handle single Feature with LineString
+                else if (data.type === 'Feature' && data.geometry?.type === 'LineString') {
+                    waypoints = data.geometry.coordinates.map((coord, idx) => ({
+                        name: `Waypoint ${idx + 1}`,
+                        city: '',
+                        country: 'Unknown',
+                        lat: coord[1],
+                        lon: coord[0],
+                        speed: 30,
+                        type: 'Waypoint'
+                    }));
+                }
+                else {
+                    geojsonInput.style.borderColor = 'var(--color-error)';
+                    throw new Error('Unsupported format. Use: Array of {latitude, longitude}, FeatureCollection, LineString, or Feature with LineString.');
+                }
+
+                if (waypoints.length === 0) {
+                    geojsonInput.style.borderColor = 'var(--color-error)';
+                    throw new Error('No waypoints found in GeoJSON');
+                }
+
+                const routeId = name.toLowerCase().replace(/\s+/g, '_');
+                state.routes[routeId] = {
+                    name,
+                    waypoints,
+                    distance: calculateDistance(waypoints),
+                    source: 'geojson',              // NEW: Track source as GeoJSON
+                    importDate: Date.now(),         // NEW: Track import timestamp
+                    originalFileName: name          // NEW: Store route name as reference
+                };
+
+                localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+                updateRouteSelect();
+
+                // Render GeoJSON routes list
+                if (typeof renderGeoJSONRoutes === 'function') {
+                    renderGeoJSONRoutes();
+                }
+
+                addLog(`✓ Imported "${name}" with ${waypoints.length} waypoints`, 'success');
+                document.getElementById('geojsonInput').value = '';
+                document.getElementById('importRouteName').value = '';
+            } catch (e) {
+                geojsonInput.style.borderColor = 'var(--color-error)';
+                addLog(`✗ Invalid GeoJSON: ${e.message}`, 'error');
+                console.error('GeoJSON Import Error:', e);
+            }
+        }
+
+        function loadGeoJSONFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('geojsonInput').value = e.target.result;
+                document.getElementById('importRouteName').value = file.name.replace('.geojson', '').replace('.json', '');
+            };
+            reader.readAsText(file);
+        }
+
+        // Predefined Routes
+        function renderPredefinedRoutes() {
+            const html = Object.entries(predefinedRoutes).map(([key, route]) => `
+                <div class="route-item">
+                    <div class="route-info">
+                        <div class="route-name">${route.name}</div>
+                        <div class="route-meta">${route.waypoints.length} waypoints • ${route.distance} km</div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="usePredefinedRoute('${key}')">Use Route</button>
+                </div>
+            `).join('');
+            document.getElementById('predefinedRoutesList').innerHTML = html;
+        }
+
+        function usePredefinedRoute(key) {
+            const route = predefinedRoutes[key];
+            // Deep copy and add metadata
+            state.routes[key] = {
+                ...route,
+                waypoints: JSON.parse(JSON.stringify(route.waypoints)),
+                source: 'predefined'            // NEW: Track source as predefined
+            };
+            localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+            updateRouteSelect();
+            document.getElementById('routeSelect').value = key;
+            updateRoutePreview();
+            addLog(`✓ Selected: ${route.name}`, 'success');
+        }
+
+        // GeoJSON Route Management
+        const renderGeoJSONRoutes = debounce(function() {
+            perfStart('renderGeoJSONRoutes');
+            
+            try {
+                const geojsonRoutes = Object.entries(state.routes)
+                    .filter(([key, route]) => route.source === 'geojson');
+
+                const count = geojsonRoutes.length;
+                document.getElementById('geojsonRouteCount').textContent = count;
+
+                const container = document.getElementById('geojsonRoutesList');
+                if (!container) {
+                    perfEnd('renderGeoJSONRoutes');
+                    return;
+                }
+
+                // If a route is expanded, show the expanded view only
+                if (state.expandedGeoJSONRoute) {
+                    scheduleUpdate(() => {
+                        container.innerHTML = renderExpandedGeoJSONRoute(state.expandedGeoJSONRoute);
+                    });
+                    perfEnd('renderGeoJSONRoutes');
+                    return;
+                }
+
+                if (count === 0) {
+                    container.innerHTML = '<p style="color: var(--color-text-secondary); font-size: 13px;">No GeoJSON routes imported yet.</p>';
+                    perfEnd('renderGeoJSONRoutes');
+                    return;
+                }
+
+                // Use DocumentFragment for better performance
+                const fragment = document.createDocumentFragment();
+                const tempDiv = document.createElement('div');
+                
+                const html = geojsonRoutes.map(([key, route]) => {
+                    const isActive = state.isRunning && state.simMode === 'route' &&
+                                     document.getElementById('routeSelect').value === key;
+                    const activeBadge = isActive ?
+                        '<span style="color: var(--color-primary); font-size: 11px;">🔄 Currently simulating</span>' : '';
+
+                    const importDate = route.importDate ? new Date(route.importDate).toLocaleDateString() : 'Unknown';
+
+                    return `
+                        <div class="route-item">
+                            <div class="route-info">
+                                <div class="route-name">${route.name} ${activeBadge}</div>
+                                <div class="route-meta">
+                                    ${route.waypoints.length} waypoints •
+                                    ${route.distance} km •
+                                    Imported: ${importDate}
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-primary" data-action="use-geojson-route" data-key="${key}"
+                                        ${isActive ? 'disabled' : ''}>Use Route</button>
+                                <button class="btn btn-sm btn-secondary" data-action="edit-geojson-route" data-key="${key}"
+                                        ${isActive ? 'disabled' : ''}>✏️ Edit Sensors</button>
+                                <button class="btn btn-sm btn-secondary" data-action="add-waypoints-to-route" data-key="${key}"
+                                        ${isActive ? 'disabled' : ''}>➕ Add Waypoints</button>
+                                <button class="btn btn-sm btn-danger" data-action="delete-geojson-route" data-key="${key}"
+                                        ${isActive ? 'disabled' : ''}>🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                tempDiv.innerHTML = html;
+                while (tempDiv.firstChild) {
+                    fragment.appendChild(tempDiv.firstChild);
+                }
+                
+                container.innerHTML = '';
+                container.appendChild(fragment);
+                
+            } catch (error) {
+                console.error('Error in renderGeoJSONRoutes:', error);
+                addLog('⚠️ Error rendering routes. Please refresh.', 'error');
+            }
+            
+            perfEnd('renderGeoJSONRoutes');
+        }, 150);
+
+        function renderExpandedGeoJSONRoute(routeKey) {
+            perfStart('renderExpandedGeoJSONRoute');
+
+            const route = state.isEditMode && state.pendingRouteChanges && state.editingRoute === routeKey
+                ? state.pendingRouteChanges
+                : state.routes[routeKey];
+
+            if (!route) {
+                perfEnd('renderExpandedGeoJSONRoute');
+                return '';
+            }
+
+            // Initialize render state for this route
+            const WAYPOINTS_PER_CHUNK = 20;
+            const totalWaypoints = route.waypoints.length;
+
+            // Initialize or reset state if switching routes
+            if (!state.expandedRouteRenderState || state.expandedRouteRenderState.routeKey !== routeKey) {
+                state.expandedRouteRenderState = {
+                    currentEnd: Math.min(WAYPOINTS_PER_CHUNK, totalWaypoints),
+                    routeKey: routeKey
+                };
+            }
+
+            const currentEnd = state.expandedRouteRenderState.currentEnd;
+
+            // Insert before first waypoint form (conditionally rendered)
+            const insertBeforeForm = state.insertingAfterIdx === -1 ? `
+                <div style="padding: 12px; border-bottom: 2px solid var(--color-primary); background: var(--color-bg-secondary);">
+                    <h4 style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-primary);">➕ Insert New Waypoint at Beginning</h4>
+
+                    <!-- Basic Info -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" id="insert-name--1" class="form-control" placeholder="Name *" style="font-size: 12px;">
+                        <input type="text" id="insert-city--1" class="form-control" placeholder="City *" style="font-size: 12px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="number" id="insert-lat--1" class="form-control" placeholder="Latitude * (-90 to 90)" step="0.000001" style="font-size: 12px;">
+                        <input type="number" id="insert-lon--1" class="form-control" placeholder="Longitude * (-180 to 180)" step="0.000001" style="font-size: 12px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                        <input type="number" id="insert-speed--1" class="form-control" placeholder="Speed (km/h)" value="30" min="0" style="font-size: 12px;">
+                        <select id="insert-type--1" class="form-control" style="font-size: 12px;">
+                            <option value="Waypoint">Waypoint</option>
+                            <option value="Stop">Stop</option>
+                            <option value="Port">Port</option>
+                            <option value="Border">Border</option>
+                        </select>
+                    </div>
+
+                    <!-- Sensor Properties (Collapsible) -->
+                    <details style="margin-bottom: 12px;">
+                        <summary style="cursor: pointer; font-size: 12px; color: var(--color-text-secondary);">🔧 Sensor Properties (Optional)</summary>
+                        <div style="margin-top: 8px; padding: 8px; background: var(--color-bg-primary); border-radius: 4px;">
+                            <!-- Reefer -->
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; margin-bottom: 4px;">
+                                <input type="checkbox" id="insert-reeferOn--1" style="width: auto;">
+                                <span>Reefer On</span>
+                            </label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
+                                <input type="number" id="insert-temp1--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T1">
+                                <input type="number" id="insert-temp2--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T2">
+                                <input type="number" id="insert-temp3--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T3">
+                            </div>
+                            <!-- Doors -->
+                            <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-doorOpen--1" style="width: auto;">
+                                    <span>Door 1</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-doorOpen2--1" style="width: auto;">
+                                    <span>Door 2</span>
+                                </label>
+                            </div>
+                            <!-- Coupling -->
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                <input type="checkbox" id="insert-coupled--1" checked style="width: auto;">
+                                <span>Coupled</span>
+                            </label>
+                        </div>
+                    </details>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-sm" onclick="addInsertedWaypoint(-1)">✓ Add Waypoint</button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelInsertWaypoint()">✕ Cancel</button>
+                    </div>
+                </div>
+            ` : '';
+
+            // Render only visible waypoints (chunked)
+            const waypointsHtml = route.waypoints.slice(0, currentEnd).map((wp, i) => {
+                // Build sensor status string (only show non-default values)
+                const sensors = [];
+                if (wp.reeferOn) {
+                    const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
+                    sensors.push(`❄️ ${temps}`);
+                }
+                if (wp.doorOpen || wp.doorOpen2) {
+                    const doors = [];
+                    if (wp.doorOpen) doors.push('Door1');
+                    if (wp.doorOpen2) doors.push('Door2');
+                    sensors.push(`🚪 ${doors.join('+')}`);
+                }
+                if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
+
+                const sensorInfo = sensors.length > 0
+                    ? `<br><span style="font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</span>`
+                    : '';
+
+                // Inline edit form (conditionally rendered)
+                const editForm = state.editingWaypointIdx === i ? `
+                    <div style="margin-top: 12px; padding: 12px; background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: 8px;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: var(--color-primary);">🔧 Edit Sensor Properties</h4>
+
+                        <!-- Reefer Section -->
+                        <div style="margin-bottom: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                                <input type="checkbox" id="edit-reeferOn-${i}" ${wp.reeferOn ? 'checked' : ''} style="width: auto;">
+                                <span>Reefer On</span>
+                            </label>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                            <input type="number" id="edit-temp1-${i}" value="${wp.temp1 !== undefined ? wp.temp1 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 1">
+                            <input type="number" id="edit-temp2-${i}" value="${wp.temp2 !== undefined ? wp.temp2 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 2">
+                            <input type="number" id="edit-temp3-${i}" value="${wp.temp3 !== undefined ? wp.temp3 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 3">
+                        </div>
+
+                        <!-- Doors Section -->
+                        <div style="display: flex; gap: 16px; margin-bottom: 12px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                                <input type="checkbox" id="edit-doorOpen-${i}" ${wp.doorOpen ? 'checked' : ''} style="width: auto;">
+                                <span>Door 1 Open</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                                <input type="checkbox" id="edit-doorOpen2-${i}" ${wp.doorOpen2 ? 'checked' : ''} style="width: auto;">
+                                <span>Door 2 Open</span>
+                            </label>
+                        </div>
+
+                        <!-- Coupling Section -->
+                        <div style="margin-bottom: 12px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                                <input type="checkbox" id="edit-coupled-${i}" ${wp.coupled !== false ? 'checked' : ''} style="width: auto;">
+                                <span>Coupled to Tractor</span>
+                            </label>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary btn-sm" onclick="applyWaypointEdit(${i})">✓ Apply Changes</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelWaypointEdit()">✕ Cancel</button>
+                        </div>
+                    </div>
+                ` : '';
+
+                // Inline insert form (conditionally rendered)
+                const insertForm = state.insertingAfterIdx === i ? `
+                    <div style="margin-top: 12px; padding: 12px; background: var(--color-bg-secondary); border: 1px solid var(--color-primary); border-radius: 8px;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: var(--color-primary);">➕ Insert New Waypoint</h4>
+
+                        <!-- Basic Info -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="insert-name-${i}" class="form-control" placeholder="Name *" style="font-size: 12px;">
+                            <input type="text" id="insert-city-${i}" class="form-control" placeholder="City *" style="font-size: 12px;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <input type="number" id="insert-lat-${i}" class="form-control" placeholder="Latitude * (-90 to 90)" step="0.000001" style="font-size: 12px;">
+                            <input type="number" id="insert-lon-${i}" class="form-control" placeholder="Longitude * (-180 to 180)" step="0.000001" style="font-size: 12px;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                            <input type="number" id="insert-speed-${i}" class="form-control" placeholder="Speed (km/h)" value="30" min="0" style="font-size: 12px;">
+                            <select id="insert-type-${i}" class="form-control" style="font-size: 12px;">
+                                <option value="Waypoint">Waypoint</option>
+                                <option value="Stop">Stop</option>
+                                <option value="Port">Port</option>
+                                <option value="Border">Border</option>
+                            </select>
+                        </div>
+
+                        <!-- Sensor Properties (Collapsible) -->
+                        <details style="margin-bottom: 12px;">
+                            <summary style="cursor: pointer; font-size: 12px; color: var(--color-text-secondary);">🔧 Sensor Properties (Optional)</summary>
+                            <div style="margin-top: 8px; padding: 8px; background: var(--color-bg-primary); border-radius: 4px;">
+                                <!-- Reefer -->
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; margin-bottom: 4px;">
+                                    <input type="checkbox" id="insert-reeferOn-${i}" style="width: auto;">
+                                    <span>Reefer On</span>
+                                </label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
+                                    <input type="number" id="insert-temp1-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T1">
+                                    <input type="number" id="insert-temp2-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T2">
+                                    <input type="number" id="insert-temp3-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T3">
+                                </div>
+                                <!-- Doors -->
+                                <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                        <input type="checkbox" id="insert-doorOpen-${i}" style="width: auto;">
+                                        <span>Door 1</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                        <input type="checkbox" id="insert-doorOpen2-${i}" style="width: auto;">
+                                        <span>Door 2</span>
+                                    </label>
+                                </div>
+                                <!-- Coupling -->
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-coupled-${i}" checked style="width: auto;">
+                                    <span>Coupled</span>
+                                </label>
+                            </div>
+                        </details>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary btn-sm" onclick="addInsertedWaypoint(${i})">✓ Add Waypoint</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelInsertWaypoint()">✕ Cancel</button>
+                        </div>
+                    </div>
+                ` : '';
+
+                // Action buttons
+                const actionButtons = `
+                    <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-sm" onclick="editWaypoint(${i})" ${state.editingWaypointIdx === i ? 'disabled' : ''}>
+                            ✏️ Edit Sensors
+                        </button>
+                        ${i === 0 ? `
+                            <button class="btn btn-secondary btn-sm" onclick="insertWaypointBefore(0)">
+                                ➕ Insert Before
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-secondary btn-sm" onclick="insertWaypointAfter(${i})">
+                            ➕ Insert Below
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteWaypoint(${i})" ${state.editingWaypointIdx === i ? 'disabled' : ''}>
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+
+                return `
+                    <div style="padding: 12px; border-bottom: 1px solid var(--color-border); ${state.editingWaypointIdx === i ? 'background: rgba(33,128,141,0.05);' : ''}">
+                        <strong>${i + 1}. ${wp.name}</strong> <span style="color: var(--color-text-secondary);">• ${wp.city}, ${wp.type}</span><br>
+                        📍 ${wp.lat.toFixed(4)}, ${wp.lon.toFixed(4)} • 🚚 ${wp.speed} km/h
+                        ${sensorInfo}
+                        ${editForm}
+                        ${insertForm}
+                        ${actionButtons}
+                    </div>
+                `;
+            }).join('');
+
+            // Load More button (conditionally rendered)
+            const loadMoreButton = currentEnd < totalWaypoints ? `
+                <div style="padding: 16px; text-align: center; border-top: 1px solid var(--color-border);">
+                    <button class="btn btn-secondary" onclick="loadMoreExpandedWaypoints('${routeKey}')">
+                        📜 Load More Waypoints (${totalWaypoints - currentEnd} remaining)
+                    </button>
+                    <p style="font-size: 11px; color: var(--color-text-secondary); margin-top: 8px;">
+                        Showing ${currentEnd} of ${totalWaypoints} waypoints
+                    </p>
+                </div>
+            ` : '';
+
+            // Global save/cancel buttons
+            const saveControls = state.isEditMode ? `
+                <div style="margin-top: 16px; padding: 16px; background: var(--color-bg-secondary); border-top: 2px solid var(--color-border); display: flex; gap: 12px; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-secondary" onclick="collapseGeoJSONRoute()">← Back to List</button>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="undoWaypointDeletion()" ${state.deletedWaypointsStack.length === 0 ? 'disabled' : ''}>
+                            ↩️ Undo Delete (${state.deletedWaypointsStack.length})
+                        </button>
+                        <button class="btn btn-primary" onclick="saveRouteChanges()">💾 Save Route Changes</button>
+                        <button class="btn btn-secondary" onclick="cancelRouteEditing()">✕ Discard All Changes</button>
+                    </div>
+                </div>
+            ` : `
+                <div style="margin-top: 16px; padding: 16px; background: var(--color-bg-secondary); border-top: 2px solid var(--color-border);">
+                    <button class="btn btn-secondary" onclick="collapseGeoJSONRoute()">← Back to List</button>
+                </div>
+            `;
+
+            const html = `
+                <div style="border: 2px solid var(--color-primary); border-radius: 8px; margin-top: 12px; background: var(--color-bg-primary);">
+                    <div style="padding: 16px; background: var(--color-primary); color: white; font-weight: 600;">
+                        📥 ${route.name} <span style="font-weight: normal; font-size: 13px;">(${route.waypoints.length} waypoints)</span>
+                    </div>
+
+                    <!-- Insert-before form OUTSIDE scrollable container for accessibility -->
+                    ${insertBeforeForm}
+
+                    <!-- Scrollable waypoints container -->
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        ${waypointsHtml}
+                        ${loadMoreButton}
+                    </div>
+                    ${saveControls}
+                </div>
+            `;
+
+            perfEnd('renderExpandedGeoJSONRoute');
+            return html;
+        }
+
+        function loadMoreExpandedWaypoints(routeKey) {
+            perfStart('loadMoreExpandedWaypoints');
+
+            const WAYPOINTS_PER_CHUNK = 20;
+            const route = state.routes[routeKey];
+            if (!route) {
+                perfEnd('loadMoreExpandedWaypoints');
+                return;
+            }
+
+            const totalWaypoints = route.waypoints.length;
+
+            // Initialize state if not exists
+            if (!state.expandedRouteRenderState) {
+                state.expandedRouteRenderState = { currentEnd: WAYPOINTS_PER_CHUNK, routeKey };
+            }
+
+            const currentEnd = state.expandedRouteRenderState.currentEnd;
+            const newEndIdx = Math.min(currentEnd + WAYPOINTS_PER_CHUNK, totalWaypoints);
+
+            // Update state
+            state.expandedRouteRenderState.currentEnd = newEndIdx;
+            state.expandedRouteRenderState.routeKey = routeKey;
+
+            // Re-render with new range using scheduleUpdate for non-blocking
+            scheduleUpdate(() => {
+                renderGeoJSONRoutes();
+            });
+
+            addLog(`📜 Loaded ${newEndIdx - currentEnd} more waypoints (${newEndIdx}/${totalWaypoints})`, 'info');
+            perfEnd('loadMoreExpandedWaypoints');
+        }
+
+        function deleteGeoJSONRoute(routeKey) {
+            // Active simulation protection
+            if (state.isRunning && state.simMode === 'route' &&
+                document.getElementById('routeSelect').value === routeKey) {
+                addLog('⚠ Cannot delete route that is currently being simulated. Stop simulation first.', 'error');
+                return;
+            }
+
+            const route = state.routes[routeKey];
+            if (!route) return;
+
+            if (!confirm(`Delete "${route.name}"?\n\nThis will permanently remove this route and all ${route.waypoints.length} waypoints.`)) {
+                return;
+            }
+
+            // Delete from state and localStorage
+            delete state.routes[routeKey];
+            localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+
+            // Update all UI components
+            updateRouteSelect();
+            renderGeoJSONRoutes();
+
+            // Clear route preview if this route was selected
+            if (document.getElementById('routeSelect').value === routeKey) {
+                document.getElementById('routeSelect').value = '';
+                updateRoutePreview();
+            }
+
+            addLog(`✓ Deleted route: ${route.name}`, 'success');
+        }
+
+        function useGeoJSONRoute(routeKey) {
+            // Same logic as usePredefinedRoute but for GeoJSON routes
+            document.getElementById('routeSelect').value = routeKey;
+            updateRoutePreview();
+            switchTab('simulator');
+            addLog(`✓ Selected: ${state.routes[routeKey].name}`, 'success');
+        }
+
+        function editGeoJSONRoute(routeKey) {
+            // Expand the route inline in Route Management tab
+            state.expandedGeoJSONRoute = routeKey;
+
+            // Enter edit mode immediately
+            enableEditMode(routeKey);
+
+            // Re-render to show expanded view with edit capabilities
+            renderGeoJSONRoutes();
+
+            addLog(`✏️ Editing route: ${state.routes[routeKey].name}`, 'info');
+        }
+
+        function addWaypointsToRoute(routeKey) {
+            // Expand the route inline in Route Management tab
+            state.expandedGeoJSONRoute = routeKey;
+
+            // Enter edit mode for waypoint insertion
+            enableEditMode(routeKey);
+
+            // Re-render to show expanded view with insert capabilities
+            renderGeoJSONRoutes();
+
+            addLog(`➕ Add waypoints to: ${state.routes[routeKey].name}`, 'info');
+        }
+
+        function collapseGeoJSONRoute() {
+            // Exit edit mode if active
+            if (state.isEditMode) {
+                if (state.pendingRouteChanges &&
+                    confirm('Discard unsaved changes to current route?')) {
+                    state.editingRoute = null;
+                    state.editingWaypointIdx = null;
+                    state.pendingRouteChanges = null;
+                    state.isEditMode = false;
+                    state.insertingAfterIdx = null;
+                    state.deletedWaypointsStack = [];  // Clear undo stack when discarding
+                } else if (!state.pendingRouteChanges) {
+                    // No pending changes, just exit edit mode
+                    state.editingRoute = null;
+                    state.editingWaypointIdx = null;
+                    state.isEditMode = false;
+                    state.insertingAfterIdx = null;
+                    state.deletedWaypointsStack = [];  // Clear undo stack when exiting
+                } else {
+                    // User cancelled, stay in expanded view
+                    return;
+                }
+            }
+
+            // Collapse the expanded route
+            state.expandedGeoJSONRoute = null;
+
+            // Reset render state for next expansion
+            state.expandedRouteRenderState = null;
+
+            // Re-render to show route list
+            renderGeoJSONRoutes();
+
+            addLog(`← Back to route list`, 'info');
+        }
+
+        // Route Selection
+        function updateRouteSelect() {
+            const select = document.getElementById('routeSelect');
+            const current = select.value;
+
+            let options = '<option value="">-- Choose a route --</option>';
+
+            // Predefined routes
+            Object.entries(predefinedRoutes).forEach(([key, route]) => {
+                options += `<option value="${key}">${route.name}</option>`;
+            });
+
+            // Custom routes with source indicators
+            Object.entries(state.routes).forEach(([key, route]) => {
+                if (!predefinedRoutes[key]) {
+                    const prefix = route.source === 'geojson' ? '📥' : '✏️';
+                    options += `<option value="${key}">${prefix} ${route.name}</option>`;
+                }
+            });
+
+            select.innerHTML = options;
+            if (current) select.value = current;
+        }
+
+        const updateRoutePreview = debounce(function() {
+            perfStart('updateRoutePreview');
+            
+            try {
+                const key = document.getElementById('routeSelect').value;
+                const previewElement = document.getElementById('routePreview');
+                
+                if (!key) {
+                    previewElement.innerHTML = '<p style="color: var(--color-text-secondary);">Select a route to preview</p>';
+                    perfEnd('updateRoutePreview');
+                    return;
+                }
+
+                // Use pending changes if in edit mode, otherwise use saved route
+                const route = state.isEditMode && state.pendingRouteChanges
+                    ? state.pendingRouteChanges
+                    : (state.routes[key] || predefinedRoutes[key]);
+
+                state.currentRoute = route;
+
+                // VIRTUAL SCROLLING: Only render waypoints that are visible + buffer
+                const WAYPOINTS_PER_CHUNK = 20;
+                const totalWaypoints = route.waypoints.length;
+                
+                // If few waypoints, render all immediately
+                if (totalWaypoints <= WAYPOINTS_PER_CHUNK) {
+                    scheduleUpdate(() => {
+                        previewElement.innerHTML = renderRoutePreviewContent(route, 0, totalWaypoints);
+                    });
+                } else {
+                    // Lazy load with "Load More" button
+                    scheduleUpdate(() => {
+                        previewElement.innerHTML = renderRoutePreviewContent(route, 0, WAYPOINTS_PER_CHUNK, true);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error in updateRoutePreview:', error);
+                addLog('⚠️ Error updating route preview', 'error');
+            }
+            
+            perfEnd('updateRoutePreview');
+        }, 150);
+
+        function renderRoutePreviewContent(route, startIdx, endIdx, showLoadMore = false) {
+            // Insert before first waypoint form (conditionally rendered)
+            const insertBeforeForm = state.insertingAfterIdx === -1 ? renderInsertForm(-1) : '';
+
+            const waypointsHtml = route.waypoints.slice(startIdx, endIdx).map((wp, relativeIdx) => {
+                const i = startIdx + relativeIdx;
+                return renderWaypointItem(wp, i, route);
+            }).join('');
+
+            // Load more button
+            const loadMoreButton = showLoadMore && endIdx < route.waypoints.length ? `
+                <div style="padding: 16px; text-align: center;">
+                    <button class="btn btn-secondary" onclick="loadMoreWaypoints(${endIdx})">
+                        Load More Waypoints (${route.waypoints.length - endIdx} remaining)
+                    </button>
+                </div>
+            ` : '';
+
+            // Global save/cancel buttons (show when in edit mode)
+            const saveControls = state.isEditMode ? `
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--color-border); display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="undoWaypointDeletion()" ${state.deletedWaypointsStack.length === 0 ? 'disabled' : ''}>
+                        ↩️ Undo Delete (${state.deletedWaypointsStack.length})
+                    </button>
+                    <button class="btn btn-primary" onclick="saveRouteChanges()">💾 Save Route Changes</button>
+                    <button class="btn btn-secondary" onclick="cancelRouteEditing()">✕ Discard All Changes</button>
+                </div>
+            ` : '';
+
+            return insertBeforeForm + waypointsHtml + loadMoreButton + saveControls;
+        }
+
+        // Helper to render individual waypoint (reusable)
+        function renderWaypointItem(wp, i, route) {
+            const sensors = [];
+            if (wp.reeferOn) {
+                const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
+                sensors.push(`❄️ ${temps}`);
+            }
+            if (wp.doorOpen || wp.doorOpen2) {
+                const doors = [];
+                if (wp.doorOpen) doors.push('Door1');
+                if (wp.doorOpen2) doors.push('Door2');
+                sensors.push(`🚪 ${doors.join('+')}`);
+            }
+            if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
+
+            const sensorInfo = sensors.length > 0
+                ? `<br><span style="font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</span>`
+                : '';
+
+            // Only render forms if this specific waypoint is being edited/inserted
+            const editForm = state.editingWaypointIdx === i ? renderEditForm(wp, i) : '';
+            const insertForm = state.insertingAfterIdx === i ? renderInsertForm(i) : '';
+
+            // Action buttons
+            const isSimulated = state.isRunning && i <= state.currentWaypointIdx;
+            const isCurrent = state.isRunning && i === state.currentWaypointIdx;
+
+            let actionButtons = '';
+            if (isSimulated) {
+                actionButtons = '<p style="font-size: 11px; color: var(--color-text-secondary); margin-top: 8px;">✓ Already simulated</p>';
+            } else if (isCurrent) {
+                actionButtons = '<p style="font-size: 11px; color: var(--color-warning); margin-top: 8px;">⏩ Currently sending...</p>';
+            } else {
+                actionButtons = `
+                    <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-sm" data-action="edit-waypoint" data-index="${i}" ${state.editingWaypointIdx === i ? 'disabled' : ''}>
+                            ✏️ Edit Sensors
+                        </button>
+                        ${i === 0 ? `
+                            <button class="btn btn-secondary btn-sm" data-action="insert-waypoint-before" data-index="0">
+                                ➕ Insert Before
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-secondary btn-sm" data-action="insert-waypoint-after" data-index="${i}">
+                            ➕ Insert Below
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-action="delete-waypoint" data-index="${i}" ${state.editingWaypointIdx === i ? 'disabled' : ''}>
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div style="padding: var(--space-8) 0; border-bottom: 1px solid var(--color-border); ${state.editingWaypointIdx === i ? 'background: rgba(33,128,141,0.05);' : ''}">
+                    <strong>${i + 1}. ${wp.name}</strong> <span style="color: var(--color-text-secondary);">• ${wp.city}, ${wp.type}</span><br>
+                    📍 ${wp.lat.toFixed(4)}, ${wp.lon.toFixed(4)} • 🚚 ${wp.speed} km/h
+                    ${sensorInfo}
+                    ${editForm}
+                    ${insertForm}
+                    ${actionButtons}
+                </div>
+            `;
+        }
+
+        // Load more waypoints dynamically
+        function loadMoreWaypoints(currentEndIdx) {
+            perfStart('loadMoreWaypoints');
+            
+            const key = document.getElementById('routeSelect').value;
+            const route = state.isEditMode && state.pendingRouteChanges
+                ? state.pendingRouteChanges
+                : (state.routes[key] || predefinedRoutes[key]);
+
+            const WAYPOINTS_PER_CHUNK = 20;
+            const newEndIdx = Math.min(currentEndIdx + WAYPOINTS_PER_CHUNK, route.waypoints.length);
+
+            // Render additional waypoints
+            const additionalWaypoints = route.waypoints.slice(currentEndIdx, newEndIdx).map((wp, relativeIdx) => {
+                const i = currentEndIdx + relativeIdx;
+                return renderWaypointItem(wp, i, route);
+            }).join('');
+
+            // Find the load more button and replace it
+            const previewElement = document.getElementById('routePreview');
+            const loadMoreBtn = previewElement.querySelector('button[onclick^="loadMoreWaypoints"]');
+            
+            if (loadMoreBtn) {
+                const parent = loadMoreBtn.parentElement;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = additionalWaypoints;
+                
+                // Insert new waypoints before the load more button
+                while (tempDiv.firstChild) {
+                    parent.parentNode.insertBefore(tempDiv.firstChild, parent);
+                }
+
+                // Update or remove load more button
+                if (newEndIdx < route.waypoints.length) {
+                    loadMoreBtn.textContent = `Load More Waypoints (${route.waypoints.length - newEndIdx} remaining)`;
+                    loadMoreBtn.setAttribute('onclick', `loadMoreWaypoints(${newEndIdx})`);
+                } else {
+                    parent.remove();
+                }
+            }
+            
+            perfEnd('loadMoreWaypoints');
+        }
+
+        // Helper functions to render forms (prevents duplication)
+        function renderEditForm(wp, i) {
+            return `
+                <div id="editForm-${i}" style="margin-top: 12px; padding: 12px; background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: 8px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 13px; color: var(--color-primary);">🔧 Edit Sensor Properties</h4>
+
+                    <div style="margin-bottom: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                            <input type="checkbox" id="edit-reeferOn-${i}" ${wp.reeferOn ? 'checked' : ''} style="width: auto;">
+                            <span>Reefer On</span>
+                        </label>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                        <input type="number" id="edit-temp1-${i}" value="${wp.temp1 !== undefined ? wp.temp1 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 1">
+                        <input type="number" id="edit-temp2-${i}" value="${wp.temp2 !== undefined ? wp.temp2 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 2">
+                        <input type="number" id="edit-temp3-${i}" value="${wp.temp3 !== undefined ? wp.temp3 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 3">
+                    </div>
+
+                    <div style="display: flex; gap: 16px; margin-bottom: 12px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                            <input type="checkbox" id="edit-doorOpen-${i}" ${wp.doorOpen ? 'checked' : ''} style="width: auto;">
+                            <span>Door 1 Open</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                            <input type="checkbox" id="edit-doorOpen2-${i}" ${wp.doorOpen2 ? 'checked' : ''} style="width: auto;">
+                            <span>Door 2 Open</span>
+                        </label>
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                            <input type="checkbox" id="edit-coupled-${i}" ${wp.coupled !== false ? 'checked' : ''} style="width: auto;">
+                            <span>Coupled to Tractor</span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-sm" onclick="applyWaypointEdit(${i})">✓ Apply Changes</button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelWaypointEdit()">✕ Cancel</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInsertForm(afterIdx) {
+            return `
+                <div id="insertForm-${afterIdx}" style="margin-top: 12px; padding: 12px; background: var(--color-bg-secondary); border: 1px solid var(--color-primary); border-radius: 8px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 13px; color: var(--color-primary);">➕ Insert New Waypoint${afterIdx === -1 ? ' at Beginning' : ''}</h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" id="insert-name-${afterIdx}" class="form-control" placeholder="Name *" style="font-size: 12px;">
+                        <input type="text" id="insert-city-${afterIdx}" class="form-control" placeholder="City *" style="font-size: 12px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="number" id="insert-lat-${afterIdx}" class="form-control" placeholder="Latitude * (-90 to 90)" step="0.000001" style="font-size: 12px;">
+                        <input type="number" id="insert-lon-${afterIdx}" class="form-control" placeholder="Longitude * (-180 to 180)" step="0.000001" style="font-size: 12px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                        <input type="number" id="insert-speed-${afterIdx}" class="form-control" placeholder="Speed (km/h)" value="30" min="0" style="font-size: 12px;">
+                        <select id="insert-type-${afterIdx}" class="form-control" style="font-size: 12px;">
+                            <option value="Waypoint">Waypoint</option>
+                            <option value="Stop">Stop</option>
+                            <option value="Port">Port</option>
+                            <option value="Border">Border</option>
+                        </select>
+                    </div>
+
+                    <details style="margin-bottom: 12px;">
+                        <summary style="cursor: pointer; font-size: 12px; color: var(--color-text-secondary);">🔧 Sensor Properties (Optional)</summary>
+                        <div style="margin-top: 8px; padding: 8px; background: var(--color-bg-primary); border-radius: 4px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; margin-bottom: 4px;">
+                                <input type="checkbox" id="insert-reeferOn-${afterIdx}" style="width: auto;">
+                                <span>Reefer On</span>
+                            </label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
+                                <input type="number" id="insert-temp1-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T1">
+                                <input type="number" id="insert-temp2-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T2">
+                                <input type="number" id="insert-temp3-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T3">
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-doorOpen-${afterIdx}" style="width: auto;">
+                                    <span>Door 1</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-doorOpen2-${afterIdx}" style="width: auto;">
+                                    <span>Door 2</span>
+                                </label>
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                <input type="checkbox" id="insert-coupled-${afterIdx}" checked style="width: auto;">
+                                <span>Coupled</span>
+                            </label>
+                        </div>
+                    </details>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-sm" onclick="addInsertedWaypoint(${afterIdx})">✓ Add Waypoint</button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelInsertWaypoint()">✕ Cancel</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Route Editing Functions
+        function editWaypoint(waypointIdx) {
+            // Get route key from dropdown or expanded GeoJSON route
+            const routeKey = state.expandedGeoJSONRoute || document.getElementById('routeSelect').value;
+
+            // Block editing current or past waypoints during simulation
+            if (state.isRunning && waypointIdx <= state.currentWaypointIdx) {
+                addLog('⚠ Cannot edit current or already-simulated waypoints', 'error');
+                return;
+            }
+
+            // Pause simulation if running (only when editing future waypoints)
+            if (state.isRunning) {
+                pauseSimulationForEdit();
+            }
+
+            // Initialize edit mode if not already active
+            if (!state.isEditMode) {
+                enableEditMode(routeKey);
+            }
+
+            // Set which waypoint is being edited
+            state.editingWaypointIdx = waypointIdx;
+
+            // Re-render to show edit form
+            if (state.expandedGeoJSONRoute) {
+                renderGeoJSONRoutes();
+            } else {
+                updateRoutePreview();
+            }
+
+            addLog(`✏️ Editing waypoint ${waypointIdx + 1}`, 'info');
+        }
+
+        function enableEditMode(routeKey) {
+            const route = state.routes[routeKey] || predefinedRoutes[routeKey];
+
+            // Handle predefined routes: copy to custom routes
+            if (predefinedRoutes[routeKey] && !state.routes[routeKey]) {
+                const timestamp = Date.now();
+                const newKey = `${routeKey}_custom_${timestamp}`;
+
+                // Deep copy predefined route to custom routes with metadata
+                state.routes[newKey] = JSON.parse(JSON.stringify(route));
+                state.routes[newKey].name = `${route.name} (Custom Copy)`;
+                state.routes[newKey].source = 'builder';  // Custom copies become builder routes
+
+                // Persist to localStorage
+                localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+
+                // Update route selector
+                updateRouteSelect();
+                document.getElementById('routeSelect').value = newKey;
+
+                addLog(`📋 Copied predefined route to custom routes for editing`, 'success');
+                routeKey = newKey;
+            }
+            // GeoJSON routes and builder routes are editable directly (no copy needed)
+
+            // Create pending changes copy (uncommitted edits)
+            state.editingRoute = routeKey;
+            state.pendingRouteChanges = JSON.parse(JSON.stringify(state.routes[routeKey]));
+            state.isEditMode = true;
+        }
+
+        function applyWaypointEdit(waypointIdx) {
+            perfStart('applyWaypointEdit');
+            
+            if (!state.pendingRouteChanges) {
+                perfEnd('applyWaypointEdit');
+                return;
+            }
+
+            const wp = state.pendingRouteChanges.waypoints[waypointIdx];
+
+            // Read form values
+            wp.reeferOn = document.getElementById(`edit-reeferOn-${waypointIdx}`).checked;
+            wp.temp1 = parseFloat(document.getElementById(`edit-temp1-${waypointIdx}`).value) || 20;
+            wp.temp2 = parseFloat(document.getElementById(`edit-temp2-${waypointIdx}`).value) || 20;
+            wp.temp3 = parseFloat(document.getElementById(`edit-temp3-${waypointIdx}`).value) || 20;
+            wp.doorOpen = document.getElementById(`edit-doorOpen-${waypointIdx}`).checked;
+            wp.doorOpen2 = document.getElementById(`edit-doorOpen2-${waypointIdx}`).checked;
+            wp.coupled = document.getElementById(`edit-coupled-${waypointIdx}`).checked;
+
+            // Close edit form
+            state.editingWaypointIdx = null;
+
+            // Schedule re-render to show updated sensor badges
+            scheduleUpdate(() => {
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+            });
+
+            addLog(`✓ Waypoint ${waypointIdx + 1} sensors updated (not saved yet)`, 'info');
+            perfEnd('applyWaypointEdit');
+        }
+
+        function cancelWaypointEdit() {
+            state.editingWaypointIdx = null;
+
+            scheduleUpdate(() => {
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+            });
+
+            addLog('✕ Waypoint edit cancelled', 'info');
+        }
+
+        function deleteWaypoint(waypointIdx) {
+            perfStart('deleteWaypoint');
+
+            if (!state.pendingRouteChanges) {
+                addLog('⚠ No route is being edited', 'error');
+                perfEnd('deleteWaypoint');
+                return;
+            }
+
+            const waypoints = state.pendingRouteChanges.waypoints;
+
+            if (waypointIdx < 0 || waypointIdx >= waypoints.length) {
+                addLog('⚠ Invalid waypoint index', 'error');
+                perfEnd('deleteWaypoint');
+                return;
+            }
+
+            // Cannot delete during active simulation if waypoint is current or past
+            if (state.isRunning && state.simMode === 'route' && waypointIdx <= state.currentWaypointIdx) {
+                addLog('⚠ Cannot delete current or already-simulated waypoints during active simulation', 'error');
+                perfEnd('deleteWaypoint');
+                return;
+            }
+
+            const deletedWaypoint = waypoints[waypointIdx];
+
+            // Store deleted waypoint with its index for undo functionality
+            state.deletedWaypointsStack.push({
+                waypoint: JSON.parse(JSON.stringify(deletedWaypoint)), // Deep copy
+                index: waypointIdx
+            });
+
+            // Remove waypoint from route
+            waypoints.splice(waypointIdx, 1);
+
+            // Recalculate distance
+            state.pendingRouteChanges.distance = calculateDistance(waypoints);
+
+            // Close any open edit forms
+            state.editingWaypointIdx = null;
+            state.insertingAfterIdx = null;
+
+            // Schedule re-render
+            scheduleUpdate(() => {
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+            });
+
+            addLog(`🗑️ Deleted waypoint "${deletedWaypoint.name}" (can undo before saving)`, 'info');
+            perfEnd('deleteWaypoint');
+        }
+
+        function undoWaypointDeletion() {
+            perfStart('undoWaypointDeletion');
+
+            if (!state.pendingRouteChanges) {
+                addLog('⚠ No route is being edited', 'error');
+                perfEnd('undoWaypointDeletion');
+                return;
+            }
+
+            if (state.deletedWaypointsStack.length === 0) {
+                addLog('⚠ No deletions to undo', 'info');
+                perfEnd('undoWaypointDeletion');
+                return;
+            }
+
+            // Pop the most recent deletion
+            const deletion = state.deletedWaypointsStack.pop();
+            const { waypoint, index } = deletion;
+
+            // Re-insert waypoint at its original position
+            state.pendingRouteChanges.waypoints.splice(index, 0, waypoint);
+
+            // Recalculate distance
+            state.pendingRouteChanges.distance = calculateDistance(state.pendingRouteChanges.waypoints);
+
+            // Schedule re-render
+            scheduleUpdate(() => {
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+            });
+
+            addLog(`↩️ Restored waypoint "${waypoint.name}" at position ${index + 1}`, 'success');
+            perfEnd('undoWaypointDeletion');
+        }
+
+        function saveRouteChanges() {
+            if (!state.pendingRouteChanges || !state.editingRoute) return;
+
+            // Commit pending changes to actual route
+            state.routes[state.editingRoute] = state.pendingRouteChanges;
+
+            // Ensure metadata is preserved (safety check)
+            if (!state.routes[state.editingRoute].source) {
+                state.routes[state.editingRoute].source = 'builder';
+            }
+
+            // Persist to localStorage
+            localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+
+            // ALWAYS update currentRoute immediately (even during simulation)
+            const routeKey = document.getElementById('routeSelect').value;
+            state.currentRoute = state.routes[routeKey];
+
+            // Resume simulation if it was paused for editing
+            resumeSimulationAfterEdit();
+
+            // Exit edit mode
+            state.isEditMode = false;
+            state.editingRoute = null;
+            state.editingWaypointIdx = null;
+            state.pendingRouteChanges = null;
+            state.deletedWaypointsStack = [];  // Clear undo stack after saving
+
+            // Re-render all route lists
+            updateRoutePreview();
+            if (typeof renderGeoJSONRoutes === 'function') {
+                renderGeoJSONRoutes();
+            }
+
+            if (state.isRunning) {
+                addLog('✓ Route changes applied to running simulation', 'success');
+            } else {
+                addLog('✓ Route changes saved', 'success');
+            }
+        }
+
+        function cancelRouteEditing() {
+            // Confirm if multiple edits made
+            if (confirm('Discard all unsaved changes to this route?')) {
+                // Resume simulation if it was paused
+                resumeSimulationAfterEdit();
+
+                state.isEditMode = false;
+                state.editingRoute = null;
+                state.editingWaypointIdx = null;
+                state.pendingRouteChanges = null;
+                state.deletedWaypointsStack = [];  // Clear undo stack after canceling
+
+                // Re-render appropriate view
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+
+                addLog('✕ All route changes discarded', 'info');
+            }
+        }
+
+        function insertWaypointBefore(waypointIdx) {
+            // Get route key from dropdown or expanded GeoJSON route
+            const routeKey = state.expandedGeoJSONRoute || document.getElementById('routeSelect').value;
+
+            // Initialize edit mode if not already active
+            if (!state.isEditMode) {
+                enableEditMode(routeKey);
+            }
+
+            // Use -1 to indicate "insert before first waypoint"
+            state.insertingAfterIdx = -1;
+
+            // Re-render to show insert form
+            if (state.expandedGeoJSONRoute) {
+                renderGeoJSONRoutes();
+            } else {
+                updateRoutePreview();
+            }
+
+            addLog(`➕ Insert waypoint form opened before first waypoint`, 'info');
+        }
+
+        function insertWaypointAfter(waypointIdx) {
+            // Get route key from dropdown or expanded GeoJSON route
+            const routeKey = state.expandedGeoJSONRoute || document.getElementById('routeSelect').value;
+
+            // Block insertion of past/current waypoints during simulation
+            if (state.isRunning && waypointIdx <= state.currentWaypointIdx) {
+                addLog('⚠ Cannot insert waypoints before current position during simulation', 'error');
+                return;
+            }
+
+            // Initialize edit mode if not already active
+            if (!state.isEditMode) {
+                enableEditMode(routeKey);
+            }
+
+            // Set which waypoint is getting an insert
+            state.insertingAfterIdx = waypointIdx;
+
+            // Re-render to show insert form
+            if (state.expandedGeoJSONRoute) {
+                renderGeoJSONRoutes();
+            } else {
+                updateRoutePreview();
+            }
+
+            addLog(`➕ Insert waypoint form opened after position ${waypointIdx + 1}`, 'info');
+        }
+
+        function addInsertedWaypoint(afterIdx) {
+            perfStart('addInsertedWaypoint');
+            
+            console.log('=== addInsertedWaypoint called ===', {
+                afterIdx,
+                insertingAfterIdx: state.insertingAfterIdx,
+                expandedGeoJSONRoute: state.expandedGeoJSONRoute,
+                isEditMode: state.isEditMode
+            });
+
+            // Check if form elements exist
+            const nameEl = document.getElementById(`insert-name-${afterIdx}`);
+            if (!nameEl) {
+                addLog(`⚠ Insert form not found for index ${afterIdx}. Form elements may not have rendered correctly.`, 'error');
+                console.error('Form elements not found. Expected IDs:', {
+                    name: `insert-name-${afterIdx}`,
+                    city: `insert-city-${afterIdx}`,
+                    lat: `insert-lat-${afterIdx}`,
+                    lon: `insert-lon-${afterIdx}`
+                });
+                console.error('DOM check - checking if any insert forms exist:');
+                const allInputs = document.querySelectorAll('input[id^="insert-"]');
+                console.error('Found insert inputs:', Array.from(allInputs).map(el => el.id));
+                return;
+            }
+
+            console.log('Basic form elements found. Name:', nameEl.value.trim());
+
+            // Read form values
+            const name = nameEl.value.trim();
+            const city = document.getElementById(`insert-city-${afterIdx}`).value.trim();
+            const lat = parseFloat(document.getElementById(`insert-lat-${afterIdx}`).value);
+            const lon = parseFloat(document.getElementById(`insert-lon-${afterIdx}`).value);
+            const speed = parseInt(document.getElementById(`insert-speed-${afterIdx}`).value) || 30;
+            const type = document.getElementById(`insert-type-${afterIdx}`).value;
+
+            // Validation
+            if (!name || !city || isNaN(lat) || isNaN(lon)) {
+                addLog('⚠ Name, city, latitude, and longitude are required', 'error');
+                return;
+            }
+
+            if (lat < -90 || lat > 90) {
+                addLog('⚠ Latitude must be between -90 and 90', 'error');
+                return;
+            }
+
+            if (lon < -180 || lon > 180) {
+                addLog('⚠ Longitude must be between -180 and 180', 'error');
+                return;
+            }
+
+            // Read sensor properties with error handling
+            let reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled;
+            try {
+                const reeferOnEl = document.getElementById(`insert-reeferOn-${afterIdx}`);
+                const temp1El = document.getElementById(`insert-temp1-${afterIdx}`);
+                const temp2El = document.getElementById(`insert-temp2-${afterIdx}`);
+                const temp3El = document.getElementById(`insert-temp3-${afterIdx}`);
+                const doorOpenEl = document.getElementById(`insert-doorOpen-${afterIdx}`);
+                const doorOpen2El = document.getElementById(`insert-doorOpen2-${afterIdx}`);
+                const coupledEl = document.getElementById(`insert-coupled-${afterIdx}`);
+
+                if (!reeferOnEl || !temp1El || !temp2El || !temp3El || !doorOpenEl || !doorOpen2El || !coupledEl) {
+                    console.warn(`Sensor form elements not found for index ${afterIdx}. Using defaults.`);
+                    console.warn('Expected IDs:', {
+                        reeferOn: `insert-reeferOn-${afterIdx}`,
+                        temp1: `insert-temp1-${afterIdx}`,
+                        temp2: `insert-temp2-${afterIdx}`,
+                        temp3: `insert-temp3-${afterIdx}`,
+                        doorOpen: `insert-doorOpen-${afterIdx}`,
+                        doorOpen2: `insert-doorOpen2-${afterIdx}`,
+                        coupled: `insert-coupled-${afterIdx}`
+                    });
+                    throw new Error(`Sensor form elements not found for index ${afterIdx}`);
+                }
+
+                reeferOn = reeferOnEl.checked;
+                temp1 = parseFloat(temp1El.value) || 20;
+                temp2 = parseFloat(temp2El.value) || 20;
+                temp3 = parseFloat(temp3El.value) || 20;
+                doorOpen = doorOpenEl.checked;
+                doorOpen2 = doorOpen2El.checked;
+                coupled = coupledEl.checked;
+
+                console.log(`Successfully read sensor properties for index ${afterIdx}:`, {
+                    reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled
+                });
+            } catch (error) {
+                console.error('Error reading sensor properties:', error);
+                addLog(`⚠ Could not read sensor properties. Using defaults.`, 'warning');
+                // Use defaults
+                reeferOn = false;
+                temp1 = 20;
+                temp2 = 20;
+                temp3 = 20;
+                doorOpen = false;
+                doorOpen2 = false;
+                coupled = true;
+            }
+
+            // Get reference waypoint for country inheritance
+            // For insert before first waypoint (afterIdx === -1), use first waypoint as reference
+            console.log('Getting reference waypoint...', {
+                afterIdx,
+                hasPendingChanges: !!state.pendingRouteChanges,
+                waypointCount: state.pendingRouteChanges?.waypoints?.length
+            });
+
+            if (!state.pendingRouteChanges || !state.pendingRouteChanges.waypoints || state.pendingRouteChanges.waypoints.length === 0) {
+                addLog('⚠ No route data available for insertion', 'error');
+                console.error('Invalid state.pendingRouteChanges:', state.pendingRouteChanges);
+                return;
+            }
+
+            const refIndex = afterIdx === -1 ? 0 : afterIdx;
+            if (refIndex < 0 || refIndex >= state.pendingRouteChanges.waypoints.length) {
+                addLog(`⚠ Invalid waypoint index: ${refIndex}`, 'error');
+                console.error('Reference waypoint index out of bounds:', {
+                    refIndex,
+                    waypointCount: state.pendingRouteChanges.waypoints.length
+                });
+                return;
+            }
+
+            const refWaypoint = state.pendingRouteChanges.waypoints[refIndex];
+            console.log('Reference waypoint:', refWaypoint);
+
+            // Create new waypoint
+            const newWaypoint = {
+                name,
+                city,
+                country: refWaypoint.country || 'Unknown',
+                lat: parseFloat(lat.toFixed(6)),
+                lon: parseFloat(lon.toFixed(6)),
+                speed,
+                type,
+                // Sensor properties
+                reeferOn,
+                temp1,
+                temp2,
+                temp3,
+                doorOpen,
+                doorOpen2,
+                coupled
+            };
+
+            console.log('New waypoint created:', newWaypoint);
+
+            // Insert at appropriate position
+            const insertPosition = afterIdx === -1 ? 0 : afterIdx + 1;
+            console.log('Inserting waypoint at position:', insertPosition);
+
+            try {
+                state.pendingRouteChanges.waypoints.splice(insertPosition, 0, newWaypoint);
+                console.log('Waypoint inserted successfully. New count:', state.pendingRouteChanges.waypoints.length);
+            } catch (error) {
+                console.error('Error inserting waypoint:', error);
+                addLog(`⚠ Error inserting waypoint: ${error.message}`, 'error');
+                return;
+            }
+
+            // Recalculate distance
+            if (typeof calculateDistance === 'function') {
+                state.pendingRouteChanges.distance = calculateDistance(state.pendingRouteChanges.waypoints);
+            }
+
+            // Close insert form
+            state.insertingAfterIdx = null;
+
+            // Schedule re-render instead of immediate
+            console.log('Waypoint inserted successfully. Scheduling re-render.', {
+                expandedGeoJSONRoute: state.expandedGeoJSONRoute,
+                insertPosition: insertPosition,
+                totalWaypoints: state.pendingRouteChanges.waypoints.length
+            });
+
+            // Re-render with scheduled update
+            scheduleUpdate(() => {
+                try {
+                    if (state.expandedGeoJSONRoute) {
+                        renderGeoJSONRoutes();
+                    } else {
+                        updateRoutePreview();
+                    }
+                    console.log('Re-render completed successfully.');
+                } catch (error) {
+                    console.error('Error during re-render:', error);
+                    addLog(`⚠ Error updating display: ${error.message}`, 'error');
+                }
+            });
+
+            const positionMsg = afterIdx === -1 ? 'position 1' : `position ${afterIdx + 2}`;
+            addLog(`✓ Waypoint "${name}" inserted at ${positionMsg} (not saved yet)`, 'success');
+            
+            perfEnd('addInsertedWaypoint');
+        }
+
+        function cancelInsertWaypoint() {
+            state.insertingAfterIdx = null;
+
+            scheduleUpdate(() => {
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+            });
+
+            addLog('✕ Waypoint insertion cancelled', 'info');
+        }
+
+        function pauseSimulationForEdit() {
+            if (state.isRunning && state.intervalId) {
+                clearInterval(state.intervalId);
+                state.intervalId = null;
+                state.wasPausedForEdit = true;
+
+                // Stop ping worker if active
+                if (state.pingWorker) {
+                    state.pingWorker.postMessage({ type: 'STOP' });
+                }
+
+                addLog('⏸ Simulation paused for editing', 'info');
+            }
+        }
+
+        function resumeSimulationAfterEdit() {
+            if (state.wasPausedForEdit && state.isRunning) {
+                const vehicleIdx = document.getElementById('vehicleSelect').value;
+                const interval = parseInt(document.getElementById('pingInterval').value) * 1000;
+
+                // Resume via Web Worker
+                if (state.pingWorker) {
+                    state.pingWorker.postMessage({
+                        type: 'START',
+                        interval,
+                        vehicleIdx
+                    });
+                }
+
+                state.wasPausedForEdit = false;
+                addLog('▶ Simulation resumed', 'success');
+            }
+        }
+
+        // Simulation
+        function startSimulation() {
+            const vehicleIdx = document.getElementById('vehicleSelect').value;
+            const vehicleSelect = document.getElementById('vehicleSelect');
+            const routeSelect = document.getElementById('routeSelect');
+            
+            // Clear previous validation states
+            vehicleSelect.style.borderColor = '';
+            if (routeSelect) routeSelect.style.borderColor = '';
+
+            if (vehicleIdx === '') {
+                vehicleSelect.style.borderColor = 'var(--color-error)';
+                vehicleSelect.focus();
+                addLog('⚠ Select a vehicle first', 'error');
+                return;
+            }
+
+            if (state.simMode === 'route') {
+                // Always reload route from storage to pick up any saved edits
+                const routeKey = routeSelect.value;
+                if (!routeKey) {
+                    routeSelect.style.borderColor = 'var(--color-error)';
+                    routeSelect.focus();
+                    addLog('⚠ Select a route first', 'error');
+                    return;
+                }
+                // Load from state.routes first (includes any saved edits), fallback to predefined
+                state.currentRoute = state.routes[routeKey] || predefinedRoutes[routeKey];
+                
+                if (!state.currentRoute) {
+                    routeSelect.style.borderColor = 'var(--color-error)';
+                    addLog('⚠ Selected route not found', 'error');
+                    return;
+                }
+
+                // Load session for this vehicle+route combination
+                const sessionLoaded = loadSession(vehicleIdx, routeKey);
+                if (!sessionLoaded) {
+                    // New session - reset counters
+                    state.currentWaypointIdx = 0;
+                    state.pingCount = 0;
+                }
+            } else {
+                // Reset for non-route modes
+                state.currentWaypointIdx = 0;
+                state.pingCount = 0;
+            }
+
+            state.isRunning = true;
+
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-flex';
+
+            const modeLabel = state.simMode === 'live' ? 'Live GPS' : state.simMode === 'static' ? 'Static Location' : state.currentRoute?.name || 'Route';
+            const vehicle = state.vehicles[vehicleIdx];
+            const resumeMsg = state.simMode === 'route' && state.currentWaypointIdx > 0 
+                ? ` (resuming from waypoint ${state.currentWaypointIdx + 1})` 
+                : '';
+            addLog(`▶ Simulation started: ${vehicle.assetName} (${modeLabel})${resumeMsg} - Web Worker enabled for background operation`, 'success');
+
+            const interval = parseInt(document.getElementById('pingInterval').value) * 1000;
+            
+            // Use Web Worker for unthrottled background execution
+            pingWorker = new Worker(workerUrl);
+            pingWorker.onmessage = () => sendPing(vehicleIdx);
+            pingWorker.postMessage({ type: 'START', interval });
+            
+            // Send first ping immediately
+            sendPing(vehicleIdx);
+        }
+
+        function stopSimulation() {
+            state.isRunning = false;
+            
+            // Stop Web Worker
+            if (pingWorker) {
+                pingWorker.postMessage({ type: 'STOP' });
+                pingWorker.terminate();
+                pingWorker = null;
+            }
+            
+            // Legacy cleanup (fallback)
+            clearInterval(state.intervalId);
+            
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'inline-flex';
+            
+            // Save session when stopping
+            if (state.simMode === 'route') {
+                const vehicleIdx = document.getElementById('vehicleSelect').value;
+                const routeKey = document.getElementById('routeSelect').value;
+                saveSession(vehicleIdx, routeKey);
+            }
+            
+            addLog('⏹ Simulation stopped (progress saved)', 'info');
+        }
+
+        function sendPing(vehicleIdx) {
+            const vehicle = state.vehicles[vehicleIdx];
+            const now = new Date();
+            let lat, lon, speed, locName, country;
+            let sensorData = {};
+
+            if (state.simMode === 'live') {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        state.currentLat = pos.coords.latitude;
+                        state.currentLon = pos.coords.longitude;
+                        state.currentSpeed = (pos.coords.speed || 0) * 3.6;
+                        updateLocationDisplay();
+                    });
+                }
+                lat = state.currentLat;
+                lon = state.currentLon;
+                speed = Math.round(state.currentSpeed);
+                locName = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                country = 'Unknown';
+            } else if (state.simMode === 'static') {
+                lat = parseFloat(document.getElementById('staticLat').value);
+                lon = parseFloat(document.getElementById('staticLon').value);
+                speed = 0;
+                locName = 'Static Location';
+                country = 'Denmark';
+            } else {
+                if (!state.currentRoute) return;
+                // Check if we've reached the end of the route
+                if (state.currentWaypointIdx >= state.currentRoute.waypoints.length) {
+                    stopSimulation();
+                    addLog(`🏁 Route completed! All ${state.currentRoute.waypoints.length} waypoints reached (${state.pingCount} total pings)`, 'success');
+                    return;
+                }
+                
+                const wp = state.currentRoute.waypoints[state.currentWaypointIdx];
+                lat = wp.lat;
+                lon = wp.lon;
+                speed = wp.speed;
+                locName = wp.name;
+                country = wp.country || 'Unknown';
+                state.currentLat = lat;
+                state.currentLon = lon;
+                state.currentSpeed = speed;
+                updateLocationDisplay();
+
+                // Extract sensor properties from waypoint (with fallback to defaults)
+                sensorData = {
+                    reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : false,
+                    temp1: wp.temp1 !== undefined ? wp.temp1 : 20,
+                    temp2: wp.temp2 !== undefined ? wp.temp2 : 20,
+                    temp3: wp.temp3 !== undefined ? wp.temp3 : 20,
+                    doorOpen: wp.doorOpen !== undefined ? wp.doorOpen : false,
+                    doorOpen2: wp.doorOpen2 !== undefined ? wp.doorOpen2 : false,
+                    coupled: wp.coupled !== undefined ? wp.coupled : true
+                };
+            }
+
+            // For live/static modes, use default sensor values
+            if (state.simMode === 'live' || state.simMode === 'static') {
+                sensorData = {
+                    reeferOn: false,
+                    temp1: 20,
+                    temp2: 20,
+                    temp3: 20,
+                    doorOpen: false,
+                    doorOpen2: false,
+                    coupled: true
+                };
+            }
+
+            const payload = {
+                apiVersion: "1.0",
+                id: generateUUID(),
+                sharingId: 10,
+                created: now.toISOString(),
+                updated: now.toISOString(),
+                specificField1: "Enhanced Telematics Simulator",
+                specificField2: "Europe Edition",
+                data: {
+                    provider: {
+                        name: "Simulator",
+                        url: "localhost"
+                    },
+                    externalCustomerIdentification: vehicle.vhId,
+                    boxdata: {
+                        BD_BOX_ID: generateUUID(),
+                        BD_TIME: Date.now(),
+                        BD_TIME_RECEIVED: Date.now(),
+                        BD_DATA_TYPE: 0,
+                        BD_IS_MOVING: speed > 5,
+                        BD_COUPLED: sensorData.coupled,
+                        BD_DURATION_DRIVING: 1760361300000,
+                        vehicle: {
+                            VH_ID: vehicle.vhId,
+                            VH_CHASSIS: vehicle.chassis,
+                            VH_LICENSE: vehicle.plate,
+                            VH_INTERNAL_NUMBER: Math.floor(Math.random() * 1000000000000000),
+                            VH_ASSET_NAME: vehicle.assetName
+                        },
+                        ebs: {
+                            BD_EBS_CHASSIS_NUMBER: "307273",
+                            BD_EBS_AXLE_LOAD_SUM: 25,
+                            BD_EBS_LOADED: false,
+                            BD_EBS_AMBER_WARNING_SIGNAL: false,
+                            BD_EBS_SERVICE_REQUEST: false
+                        },
+                        location: {
+                            BD_DETAILED_LOCATION_ISO_COUNTRY_CODE: country.substring(0, 2).toUpperCase(),
+                            BD_DETAILED_LOCATION_CITY: locName.split(',')[0],
+                            BD_DETAILED_LOCATION_COUNTRY: country
+                        },
+                        gps: {
+                            BD_GPS_LATITUDE: lat,
+                            BD_GPS_LONGITUDE: lon,
+                            BD_GPS_LOCATION: `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+                            BD_GPS_SPEED: speed,
+                            BD_GPS_HEIGHT: 0,
+                            BD_GPS_DIRECTION: Math.floor(Math.random() * 360),
+                            BD_GPS_SATELLITES: 12
+                        },
+                        reefer: {
+                            BD_REEFER_ON: sensorData.reeferOn,
+                            BD_REEFER_COOLANT_OK: true,
+                            BD_TEMP1: sensorData.temp1,
+                            BD_TEMP2: sensorData.temp2,
+                            BD_TEMP3: sensorData.temp3
+                        },
+                        batteryPack: {
+                            BD_BATTERY_PACK_STATE_OF_CHARGE: 100,
+                            BD_BATTERY_PACK_CHARGING_STATUS: "Inactive"
+                        },
+                        door: {
+                            BD_DOOR_OPEN: sensorData.doorOpen,
+                            BD_DURATION_DOOR: 0,
+                            BD_DOOR_OPEN_2: sensorData.doorOpen2
+                        }
+                    }
+                }
+            };
+
+            fetch(state.backendUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${state.bearerToken}`
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(res => {
+                    if (res.ok) {
+                        state.pingCount++;
+                        document.getElementById('pingCount').textContent = state.pingCount;
+                        
+                        // Show current waypoint position in route
+                        const currentWpNum = state.currentWaypointIdx + 1;
+                        const totalWps = state.currentRoute?.waypoints?.length || 0;
+                        const wpInfo = state.simMode === 'route' && totalWps > 0 ? ` (Waypoint ${currentWpNum}/${totalWps})` : '';
+                        
+                        addLog(`✓ Ping #${state.pingCount}: ${locName}${wpInfo}`, 'success');
+
+                        if (state.simMode === 'route') {
+                            state.currentWaypointIdx++;
+                            // Auto-save session every 5 pings
+                            if (state.pingCount % 5 === 0) {
+                                const vehicleIdx = document.getElementById('vehicleSelect').value;
+                                const routeKey = document.getElementById('routeSelect').value;
+                                saveSession(vehicleIdx, routeKey);
+                            }
+                        }
+                    } else {
+                        addLog(`✗ [${res.status}] Error at ${locName}`, 'error');
+                        queueFailedPing(payload, locName);
+                    }
+                })
+                .catch(err => {
+                    addLog(`✗ Network error - ping queued`, 'error');
+                    queueFailedPing(payload, locName);
+                });
+        }
+
+        // Background Sync - Queue and replay failed pings
+        function queueFailedPing(payload, location) {
+            const queueItem = {
+                id: generateUUID(),
+                payload: payload,
+                location: location,
+                timestamp: Date.now(),
+                retryCount: 0
+            };
+
+            failedPingsQueue.push(queueItem);
+            localStorage.setItem('failedPingsQueue', JSON.stringify(failedPingsQueue));
+            addLog(`📦 Ping queued (${failedPingsQueue.length} pending)`, 'info');
+
+            // Register background sync if available
+            if ('serviceWorker' in navigator && 'sync' in navigator.serviceWorker) {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.sync.register('sync-pings').catch(err => {
+                        console.log('Background sync registration failed:', err);
+                    });
+                });
+            }
+        }
+
+        async function syncFailedPings() {
+            if (failedPingsQueue.length === 0) return;
+
+            addLog(`🔄 Syncing ${failedPingsQueue.length} queued pings...`, 'info');
+
+            const queue = [...failedPingsQueue];
+            const successfulIds = [];
+
+            for (const item of queue) {
+                try {
+                    const res = await fetch(state.backendUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Basic ${state.bearerToken}`
+                        },
+                        body: JSON.stringify(item.payload)
+                    });
+
+                    if (res.ok) {
+                        successfulIds.push(item.id);
+                        addLog(`✓ Queued ping synced: ${item.location}`, 'success');
+                    } else {
+                        item.retryCount++;
+                        if (item.retryCount >= 3) {
+                            successfulIds.push(item.id);
+                            addLog(`✗ Ping failed 3 times, removing: ${item.location}`, 'error');
+                        }
+                    }
+                } catch (err) {
+                    console.log('Sync failed for ping:', item.id, err);
+                }
+            }
+
+            // Remove successfully synced items from queue
+            failedPingsQueue = failedPingsQueue.filter(item => !successfulIds.includes(item.id));
+            localStorage.setItem('failedPingsQueue', JSON.stringify(failedPingsQueue));
+
+            if (successfulIds.length > 0) {
+                addLog(`✓ Synced ${successfulIds.length} pings`, 'success');
+            }
+        }
+
+        // Check for queued pings on load
+        window.addEventListener('load', () => {
+            if (failedPingsQueue.length > 0) {
+                addLog(`📦 ${failedPingsQueue.length} pings queued from previous session`, 'info');
+            }
+        });
+
+        // Utilities
+        function calculateDistance(waypoints) {
+            if (waypoints.length < 2) return 0;
+            let dist = 0;
+            for (let i = 0; i < waypoints.length - 1; i++) {
+                const lat1 = waypoints[i].lat, lon1 = waypoints[i].lon;
+                const lat2 = waypoints[i + 1].lat, lon2 = waypoints[i + 1].lon;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                dist += 6371 * c;
+            }
+            return Math.round(dist);
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+
+        function setPingInterval(val) {
+            if (val) document.getElementById('pingInterval').value = val;
+        }
+
+        function saveSettings() {
+            const backendUrl = document.getElementById('backendUrl').value.trim();
+            const bearerToken = document.getElementById('bearerToken').value.trim();
+            
+            const backendUrlInput = document.getElementById('backendUrl');
+            const bearerTokenInput = document.getElementById('bearerToken');
+            
+            // Clear previous validation
+            backendUrlInput.style.borderColor = '';
+            bearerTokenInput.style.borderColor = '';
+
+            let hasError = false;
+
+            if (!backendUrl) {
+                backendUrlInput.style.borderColor = 'var(--color-error)';
+                backendUrlInput.focus();
+                hasError = true;
+            }
+
+            if (!bearerToken) {
+                bearerTokenInput.style.borderColor = 'var(--color-error)';
+                if (!hasError) bearerTokenInput.focus();
+                hasError = true;
+            }
+
+            if (hasError) {
+                addLog('⚠ Both Backend URL and Basic Token are required', 'error');
+                return;
+            }
+
+            state.backendUrl = backendUrl;
+            state.bearerToken = bearerToken;
+            localStorage.setItem('backendUrl', state.backendUrl);
+            localStorage.setItem('bearerToken', state.bearerToken);
+            addLog('✓ Settings saved', 'success');
+        }
+
+        function addVehicle() {
+            const chassis = document.getElementById('newChassis').value.trim();
+            const plate = document.getElementById('newPlate').value.trim();
+            const assetName = document.getElementById('newAssetName').value.trim();
+            const vhId = document.getElementById('newVhId').value.trim();
+
+            // Clear previous validation states
+            document.getElementById('newChassis').style.borderColor = '';
+            document.getElementById('newPlate').style.borderColor = '';
+            document.getElementById('newAssetName').style.borderColor = '';
+            document.getElementById('newVhId').style.borderColor = '';
+
+            let hasError = false;
+
+            if (!chassis) {
+                document.getElementById('newChassis').style.borderColor = 'var(--color-error)';
+                document.getElementById('newChassis').focus();
+                hasError = true;
+            }
+
+            if (!plate) {
+                document.getElementById('newPlate').style.borderColor = 'var(--color-error)';
+                if (!hasError) document.getElementById('newPlate').focus();
+                hasError = true;
+            }
+
+            if (!assetName) {
+                document.getElementById('newAssetName').style.borderColor = 'var(--color-error)';
+                if (!hasError) document.getElementById('newAssetName').focus();
+                hasError = true;
+            }
+
+            if (!vhId) {
+                document.getElementById('newVhId').style.borderColor = 'var(--color-error)';
+                if (!hasError) document.getElementById('newVhId').focus();
+                hasError = true;
+            }
+
+            if (hasError) {
+                addLog('⚠ All vehicle fields are required', 'error');
+                return;
+            }
+
+            state.vehicles.push({ chassis, plate, assetName, vhId });
+            localStorage.setItem('vehicles', JSON.stringify(state.vehicles));
+            renderVehiclesList();
+            updateVehicleSelect();
+            document.getElementById('newChassis').value = '';
+            document.getElementById('newPlate').value = '';
+            document.getElementById('newAssetName').value = '';
+            document.getElementById('newVhId').value = '';
+            addLog(`✓ Vehicle ${assetName} added`, 'success');
+        }
+
+        function renderVehiclesList() {
+            const list = document.getElementById('vehiclesList');
+            if (state.vehicles.length === 0) {
+                list.innerHTML = '<p style="color: var(--color-text-secondary); font-size: 13px;">No vehicles yet.</p>';
+                return;
+            }
+            list.innerHTML = state.vehicles.map((v, idx) => `
+                <div class="route-item">
+                    <div class="route-info">
+                        <div class="route-name">${v.assetName}</div>
+                        <div class="route-meta">${v.chassis} • ${v.plate} • ID: ${v.vhId}</div>
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="removeVehicle(${idx})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removeVehicle(idx) {
+            state.vehicles.splice(idx, 1);
+            localStorage.setItem('vehicles', JSON.stringify(state.vehicles));
+            renderVehiclesList();
+            updateVehicleSelect();
+        }
+
+        function loadSettings() {
+            document.getElementById('backendUrl').value = state.backendUrl;
+            document.getElementById('bearerToken').value = state.bearerToken;
+        }
+
+        function showToast(msg, type = 'error', duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            // Determine toast styling based on type
+            const bgColor = type === 'error' ? 'var(--color-error)' :
+                           type === 'success' ? 'var(--color-success)' :
+                           type === 'warning' ? 'var(--color-warning)' :
+                           'var(--color-primary)';
+
+            const icon = type === 'error' ? '⚠' :
+                        type === 'success' ? '✓' :
+                        type === 'warning' ? '⚠' :
+                        'ℹ️';
+
+            toast.innerHTML = `
+                <div style="background: ${bgColor}; color: white; padding: 12px 16px; border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px;
+                            animation: slideIn 0.3s ease-out;">
+                    <span style="font-size: 18px;">${icon}</span>
+                    <span style="flex: 1; font-size: 14px; line-height: 1.4;">${msg}</span>
+                    <button onclick="this.parentElement.parentElement.remove()"
+                            style="background: none; border: none; color: white; cursor: pointer;
+                                   font-size: 20px; padding: 0; width: 24px; height: 24px; line-height: 1;
+                                   opacity: 0.8; transition: opacity 0.2s;"
+                            onmouseover="this.style.opacity='1'"
+                            onmouseout="this.style.opacity='0.8'">×</button>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto-remove after duration
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s ease-out';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+        }
+
+        function addLog(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString('en-IN');
+            const logsDiv = document.getElementById('logsContent');
+            const color = type === 'success' ? '#32b8c6' : type === 'error' ? '#ff5459' : '#a7a9a9';
+            const entry = document.createElement('div');
+            entry.innerHTML = `<span style="color: #32b8c6;">[${time}]</span> <span style="color: ${color};">${msg}</span>`;
+            entry.style.paddingBottom = '4px';
+            logsDiv.appendChild(entry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+
+            // Show toast notification for errors
+            if (type === 'error') {
+                showToast(msg, 'error');
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('logsContent').innerHTML = '<div style="color: var(--color-text-secondary);">Logs cleared</div>';
+        }
+
+        function resetRoute() {
+            const vehicleIdx = document.getElementById('vehicleSelect').value;
+            const routeKey = document.getElementById('routeSelect').value;
+            
+            if (vehicleIdx && routeKey) {
+                clearSession(vehicleIdx, routeKey);
+            }
+            
+            state.currentWaypointIdx = 0;
+            state.pingCount = 0;
+            document.getElementById('pingCount').textContent = state.pingCount;
+            updateLocationDisplay();
+            addLog('🔄 Route reset to beginning (session cleared)', 'info');
+        }
+
+        // Enhanced Service Worker registration with update detection
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => {
+                        console.log('Service Worker registered');
+
+                        // Check for updates every 1 hour
+                        setInterval(() => {
+                            reg.update();
+                        }, 60 * 60 * 1000);
+
+                        // Detect updates
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    showUpdateNotification(reg);
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => console.log('SW registration failed:', err));
+
+                // Listen for sync messages from service worker
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data.type === 'SYNC_PINGS') {
+                        syncFailedPings();
+                    }
+                });
+            });
+        }
+
+        function showUpdateNotification(reg) {
+            // Create update banner
+            const banner = document.createElement('div');
+            banner.className = 'alert alert-success';
+            banner.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; max-width: 500px; display: flex; gap: 12px; align-items: center;';
+            banner.innerHTML = `
+                <span style="flex: 1;">🎉 New version available!</span>
+                <button class="btn btn-primary btn-sm" onclick="updateServiceWorker()">Update</button>
+                <button class="btn btn-secondary btn-sm" onclick="this.parentElement.remove()">Later</button>
+            `;
+
+            document.body.appendChild(banner);
+            addLog('🎉 New app version available - click Update to refresh', 'info');
+
+            // Store registration for update function
+            window.pendingSWRegistration = reg;
+        }
+
+        function updateServiceWorker() {
+            if (window.pendingSWRegistration && window.pendingSWRegistration.waiting) {
+                window.pendingSWRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+                // Reload page when new SW takes control
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

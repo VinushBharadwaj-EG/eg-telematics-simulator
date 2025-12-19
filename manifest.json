@@ -1,0 +1,60 @@
+{
+  "name": "EG Telematics Simulator",
+  "short_name": "EG Telematics",
+  "description": "Live GPS, Static Location, and Route-Based telematics simulation tool",
+  "start_url": "./telematics-simulator.html",
+  "display": "standalone",
+  "background_color": "#fcfcf9",
+  "theme_color": "#21808d",
+  "orientation": "any",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "business"],
+  "shortcuts": [
+    {
+      "name": "Start Simulation",
+      "short_name": "Start",
+      "description": "Jump directly to simulator",
+      "url": "./telematics-simulator.html#simulator",
+      "icons": [{ "src": "./icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Route Management",
+      "short_name": "Routes",
+      "description": "Manage custom routes",
+      "url": "./telematics-simulator.html#routes",
+      "icons": [{ "src": "./icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "prefer_related_applications": false
+}
