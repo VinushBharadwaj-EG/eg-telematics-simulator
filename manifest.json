@@ -1,5 +1,8 @@
 {
   "name": "EG Telematics Simulator",
+  "id": "/",
+  "lang": "en",
+  "dir": "ltr",
   "short_name": "EG Telematics",
   "description": "Live GPS, Static Location, and Route-Based telematics simulation tool",
   "start_url": "./telematics-simulator.html",
@@ -56,5 +59,28 @@
     }
   ],
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "./screenshots/simulator-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Simulator tab showing route preview and active simulation"
+    },
+    {
+      "src": "./screenshots/route-management-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Route Management tab with custom route builder"
+    },
+    {
+      "src": "./screenshots/simulator-narrow.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile view of telematics simulator"
+    }
+  ]
 }
