@@ -552,7 +552,10 @@
             </div>
 
             <div class="card" id="routePreviewCard" style="display: none;">
-                <h2>Route Preview</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin: 0;">Route Preview</h2>
+                    <div id="routePreviewActions"></div>
+                </div>
                 <div id="routePreview" style="max-height: 300px; overflow-y: auto; font-size: 13px; line-height: 1.6;">
                 </div>
             </div>
@@ -971,6 +974,7 @@
             expandedGeoJSONRoute: null,   // Track expanded route in Route Management tab
             expandedRouteRenderState: null,  // Track rendering state for expanded routes (currentEnd, routeKey)
             deletedWaypointsStack: [],    // Track deleted waypoints for undo functionality (array of {waypoint, index})
+            routePreviewRenderState: null,  // Track route preview lazy loading state (currentEnd, routeKey)
             // Default sensor data (applies to all simulation modes)
             defaultSensorData: {
                 reeferOn: false,
@@ -2277,29 +2281,22 @@
                 </div>
             ` : '';
 
-            // Global save/cancel buttons
-            const saveControls = state.isEditMode ? `
-                <div style="margin-top: 16px; padding: 16px; background: var(--color-bg-secondary); border-top: 2px solid var(--color-border); display: flex; gap: 12px; justify-content: space-between; align-items: center;">
-                    <button class="btn btn-secondary" onclick="collapseGeoJSONRoute()">← Back to List</button>
-                    <div style="display: flex; gap: 12px;">
+            const html = `
+                <div style="border: 2px solid var(--color-primary); border-radius: 8px; margin-top: 12px; background: var(--color-bg-primary);">
+                    <div style="padding: 16px; background: var(--color-primary); color: white; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                        <span>📥 ${route.name} <span style="font-weight: normal; font-size: 13px;">(${route.waypoints.length} waypoints)</span></span>
+                        <button class="btn btn-secondary" onclick="collapseGeoJSONRoute()" style="background: white; color: var(--color-primary); border: none; padding: 6px 12px; font-size: 13px;">← Back to List</button>
+                    </div>
+
+                    ${state.isEditMode ? `
+                    <div style="position: sticky; top: 0; z-index: 10; padding: 12px; background: var(--color-bg-secondary); border-bottom: 2px solid var(--color-primary); display: flex; gap: 12px; justify-content: flex-end; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                         <button class="btn btn-secondary" onclick="undoWaypointDeletion()" ${state.deletedWaypointsStack.length === 0 ? 'disabled' : ''}>
                             ↩️ Undo Delete (${state.deletedWaypointsStack.length})
                         </button>
                         <button class="btn btn-primary" onclick="saveRouteChanges()">💾 Save Route Changes</button>
                         <button class="btn btn-secondary" onclick="cancelRouteEditing()">✕ Discard All Changes</button>
                     </div>
-                </div>
-            ` : `
-                <div style="margin-top: 16px; padding: 16px; background: var(--color-bg-secondary); border-top: 2px solid var(--color-border);">
-                    <button class="btn btn-secondary" onclick="collapseGeoJSONRoute()">← Back to List</button>
-                </div>
-            `;
-
-            const html = `
-                <div style="border: 2px solid var(--color-primary); border-radius: 8px; margin-top: 12px; background: var(--color-bg-primary);">
-                    <div style="padding: 16px; background: var(--color-primary); color: white; font-weight: 600;">
-                        📥 ${route.name} <span style="font-weight: normal; font-size: 13px;">(${route.waypoints.length} waypoints)</span>
-                    </div>
+                    ` : ''}
 
                     <!-- Insert-before form OUTSIDE scrollable container for accessibility -->
                     ${insertBeforeForm}
@@ -2309,7 +2306,6 @@
                         ${waypointsHtml}
                         ${loadMoreButton}
                     </div>
-                    ${saveControls}
                 </div>
             `;
 
@@ -2499,24 +2495,54 @@
                 // VIRTUAL SCROLLING: Only render waypoints that are visible + buffer
                 const WAYPOINTS_PER_CHUNK = 20;
                 const totalWaypoints = route.waypoints.length;
-                
-                // If few waypoints, render all immediately
+
+                // Check if we're rendering the same route (preserve lazy loading state)
+                const isSameRoute = state.routePreviewRenderState && state.routePreviewRenderState.routeKey === key;
+
+                // Determine how many waypoints to show
+                let currentEnd;
                 if (totalWaypoints <= WAYPOINTS_PER_CHUNK) {
-                    scheduleUpdate(() => {
-                        previewElement.innerHTML = renderRoutePreviewContent(route, 0, totalWaypoints);
-                    });
+                    // Few waypoints, render all
+                    currentEnd = totalWaypoints;
+                } else if (isSameRoute) {
+                    // Same route - preserve current position
+                    currentEnd = Math.min(state.routePreviewRenderState.currentEnd, totalWaypoints);
                 } else {
-                    // Lazy load with "Load More" button
-                    scheduleUpdate(() => {
-                        previewElement.innerHTML = renderRoutePreviewContent(route, 0, WAYPOINTS_PER_CHUNK, true);
-                    });
+                    // New route - start with first chunk
+                    currentEnd = WAYPOINTS_PER_CHUNK;
                 }
-                
+
+                // Update render state
+                state.routePreviewRenderState = { currentEnd, routeKey: key };
+
+                // Render waypoints
+                scheduleUpdate(() => {
+                    previewElement.innerHTML = renderRoutePreviewContent(route, 0, currentEnd, currentEnd < totalWaypoints);
+                });
+
+                // Update header action buttons
+                const actionsElement = document.getElementById('routePreviewActions');
+                if (actionsElement) {
+                    if (state.isEditMode) {
+                        actionsElement.innerHTML = `
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary btn-sm" onclick="undoWaypointDeletion()" ${state.deletedWaypointsStack.length === 0 ? 'disabled' : ''}>
+                                    ↩️ Undo Delete (${state.deletedWaypointsStack.length})
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="saveRouteChanges()">💾 Save Route Changes</button>
+                                <button class="btn btn-secondary btn-sm" onclick="cancelRouteEditing()">✕ Discard All Changes</button>
+                            </div>
+                        `;
+                    } else {
+                        actionsElement.innerHTML = '';
+                    }
+                }
+
             } catch (error) {
                 console.error('Error in updateRoutePreview:', error);
                 addLog('⚠️ Error updating route preview', 'error');
             }
-            
+
             perfEnd('updateRoutePreview');
         }, 150);
 
@@ -2538,18 +2564,7 @@
                 </div>
             ` : '';
 
-            // Global save/cancel buttons (show when in edit mode)
-            const saveControls = state.isEditMode ? `
-                <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--color-border); display: flex; gap: 12px; justify-content: flex-end;">
-                    <button class="btn btn-secondary" onclick="undoWaypointDeletion()" ${state.deletedWaypointsStack.length === 0 ? 'disabled' : ''}>
-                        ↩️ Undo Delete (${state.deletedWaypointsStack.length})
-                    </button>
-                    <button class="btn btn-primary" onclick="saveRouteChanges()">💾 Save Route Changes</button>
-                    <button class="btn btn-secondary" onclick="cancelRouteEditing()">✕ Discard All Changes</button>
-                </div>
-            ` : '';
-
-            return insertBeforeForm + waypointsHtml + loadMoreButton + saveControls;
+            return insertBeforeForm + waypointsHtml + loadMoreButton;
         }
 
         // Helper to render individual waypoint (reusable)
@@ -2560,18 +2575,30 @@
                 // Using defaults - show subtle indicator
                 sensorInfo = '<br><span style="color: #6b7280; font-size: 0.85em;">⚙️ Using Defaults</span>';
             } else {
-                // Has override - build sensor badge list
+                // Has override - build sensor badge list showing ALL overridden values
                 const badges = [];
+
+                // Reefer status
                 if (wp.reeferOn) {
                     const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
                     badges.push(`❄️ ${temps}`);
                 }
+
+                // Door states - show both open and closed states
                 const doors = [];
-                if (wp.doorOpen) doors.push('Door1 Open');
-                if (wp.doorOpen2) doors.push('Door2 Open');
+                if (wp.doorOpen === true) doors.push('Door1 Open');
+                if (wp.doorOpen === false) doors.push('Door1 Closed');
+                if (wp.doorOpen2 === true) doors.push('Door2 Open');
+                if (wp.doorOpen2 === false) doors.push('Door2 Closed');
                 if (doors.length > 0) badges.push(`🚪 ${doors.join(' + ')}`);
+
+                // Coupling status
                 if (wp.coupled === false) badges.push('⚠️ Uncoupled');
-                if (wp.isMoving !== false) badges.push('🚗 In Motion');
+                if (wp.coupled === true) badges.push('🔗 Coupled');
+
+                // Motion status
+                if (wp.isMoving === false) badges.push('🚫 Stationary');
+                if (wp.isMoving === true) badges.push('🚗 In Motion');
 
                 const badgeHTML = badges.join(' • ');
                 sensorInfo = `<br><span style="background: #dbeafe; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">🎯 Override: ${badgeHTML || 'Active'}</span>`;
@@ -2644,6 +2671,11 @@
 
             const WAYPOINTS_PER_CHUNK = 20;
             const newEndIdx = Math.min(currentEndIdx + WAYPOINTS_PER_CHUNK, route.waypoints.length);
+
+            // Update render state to preserve lazy loading position
+            if (state.routePreviewRenderState) {
+                state.routePreviewRenderState.currentEnd = newEndIdx;
+            }
 
             // Render additional waypoints
             const additionalWaypoints = route.waypoints.slice(currentEndIdx, newEndIdx).map((wp, relativeIdx) => {
