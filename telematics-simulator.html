@@ -458,6 +458,72 @@
                     </div>
                 </div>
 
+                <!-- Default Sensor Data Section -->
+                <div class="form-group">
+                    <details style="border: 1px solid var(--color-border); border-radius: var(--radius-base); padding: var(--space-12);">
+                        <summary style="cursor: pointer; font-weight: 600; color: var(--color-text); margin-bottom: var(--space-12);">
+                            🔧 Default Sensor Data (Applies to All Modes)
+                        </summary>
+
+                        <!-- Refrigeration -->
+                        <div style="margin-bottom: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Refrigeration</h4>
+                            <div class="form-row" style="align-items: center; margin-bottom: var(--space-8);">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="defaultReeferOn" style="width: auto;">
+                                    <span>Reefer On</span>
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <input type="number" id="defaultTemp1" class="form-control" placeholder="Temp Zone 1 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultTemp2" class="form-control" placeholder="Temp Zone 2 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultTemp3" class="form-control" placeholder="Temp Zone 3 (°C)" value="20" min="-30" max="30" step="0.5">
+                            </div>
+                        </div>
+
+                        <!-- Doors -->
+                        <div style="margin-bottom: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Doors</h4>
+                            <div class="form-row">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="defaultDoorOpen" style="width: auto;">
+                                    <span>Door 1 Open</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="defaultDoorOpen2" style="width: auto;">
+                                    <span>Door 2 Open</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Coupling & Motion -->
+                        <div>
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Coupling & Motion</h4>
+                            <div class="form-row">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="defaultCoupled" checked style="width: auto;">
+                                    <span>Coupled to Tractor</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="defaultIsMoving" checked style="width: auto;">
+                                    <span>In Motion</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Apply Button -->
+                        <div style="margin-top: var(--space-12);">
+                            <button class="btn btn-primary" onclick="updateDefaultSensorData()" style="width: 100%;">
+                                ✓ Apply Default Sensor Values
+                            </button>
+                        </div>
+
+                        <p style="font-size: 11px; color: var(--color-text-secondary); margin-top: var(--space-12); margin-bottom: 0;">
+                            ℹ️ These defaults apply to Live GPS and Static modes. In Route mode, waypoint-specific values override these defaults.
+                        </p>
+                    </details>
+                </div>
+
                 <div class="grid-2" style="margin-bottom: var(--space-20);">
                     <div class="stat-box">
                         <div class="stat-label">Current Latitude</div>
@@ -564,12 +630,23 @@
                         </div>
 
                         <!-- Coupling Section -->
-                        <div>
+                        <div style="margin-bottom: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border);">
                             <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Coupling</h4>
                             <div class="form-row">
                                 <label style="display: flex; align-items: center; gap: var(--space-8);">
                                     <input type="checkbox" id="wpCoupled" checked style="width: auto;">
                                     <span>Coupled to Tractor</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Motion Section -->
+                        <div>
+                            <h4 style="margin: 0 0 var(--space-8) 0; font-size: 13px; color: var(--color-text-secondary);">Motion</h4>
+                            <div class="form-row">
+                                <label style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="wpIsMoving" style="width: auto;">
+                                    <span>In Motion</span>
                                 </label>
                             </div>
                         </div>
@@ -893,7 +970,18 @@
             insertingAfterIdx: null,     // Track which waypoint is getting a new waypoint inserted after it
             expandedGeoJSONRoute: null,   // Track expanded route in Route Management tab
             expandedRouteRenderState: null,  // Track rendering state for expanded routes (currentEnd, routeKey)
-            deletedWaypointsStack: []    // Track deleted waypoints for undo functionality (array of {waypoint, index})
+            deletedWaypointsStack: [],    // Track deleted waypoints for undo functionality (array of {waypoint, index})
+            // Default sensor data (applies to all simulation modes)
+            defaultSensorData: {
+                reeferOn: false,
+                temp1: 20,
+                temp2: 20,
+                temp3: 20,
+                doorOpen: false,
+                doorOpen2: false,
+                coupled: true,
+                isMoving: true
+            }
         };
 
         // Offline/Online detection
@@ -927,37 +1015,37 @@
                     {
                         name: 'Copenhagen Port', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0,
                         // Loading scenario: doors open, reefer starting
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 18, temp2: 18, temp3: 18, coupled: true
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 18, temp2: 18, temp3: 18, coupled: true, isMoving: false
                     },
                     {
                         name: 'Roskilde', country: 'Denmark', lat: 55.6419, lon: 12.0820, speed: 30,
                         // En route: doors closed, reefer cooling
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 5, temp2: 5, temp3: 5, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 5, temp2: 5, temp3: 5, coupled: true, isMoving: true
                     },
                     {
                         name: 'Kolding', country: 'Denmark', lat: 55.4784, lon: 9.4922, speed: 45,
                         // En route: optimal temps reached
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true, isMoving: true
                     },
                     {
                         name: 'Flensburg', country: 'Germany', lat: 54.7688, lon: 9.4342, speed: 50,
                         // Border crossing: stopped for inspection, one door open
-                        doorOpen: true, doorOpen2: false, reeferOn: true, temp1: 3, temp2: 3, temp3: 3, coupled: true
+                        doorOpen: true, doorOpen2: false, reeferOn: true, temp1: 3, temp2: 3, temp3: 3, coupled: true, isMoving: true
                     },
                     {
                         name: 'Kiel', country: 'Germany', lat: 54.3233, lon: 10.1350, speed: 55,
                         // En route: stable temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true, isMoving: true
                     },
                     {
                         name: 'Lübeck Port', country: 'Germany', lat: 53.8705, lon: 10.8734, speed: 40,
                         // En route: stable temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true, isMoving: true
                     },
                     {
                         name: 'Hamburg Port', country: 'Germany', lat: 53.5461, lon: 9.9922, speed: 20,
                         // Destination: unloading, doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 4, temp2: 4, temp3: 4, coupled: true
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 4, temp2: 4, temp3: 4, coupled: true, isMoving: true
                     }
                 ]
             },
@@ -968,32 +1056,32 @@
                     {
                         name: 'Copenhagen', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0,
                         // Loading: non-refrigerated cargo, doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: false
                     },
                     {
                         name: 'Odense', country: 'Denmark', lat: 55.4015, lon: 10.3918, speed: 30,
                         // En route: doors closed, ambient temp
-                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
                     },
                     {
                         name: 'Malmö', country: 'Sweden', lat: 55.6050, lon: 13.0061, speed: 40,
                         // Ferry crossing: stable
-                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
                     },
                     {
                         name: 'Stockholm', country: 'Sweden', lat: 59.3293, lon: 18.0686, speed: 45,
                         // Rest stop: one door open for inspection
-                        doorOpen: true, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                        doorOpen: true, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
                     },
                     {
                         name: 'Gdańsk', country: 'Poland', lat: 54.3720, lon: 18.6466, speed: 50,
                         // En route: doors closed
-                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
                     },
                     {
                         name: 'Warsaw', country: 'Poland', lat: 52.2297, lon: 21.0122, speed: 30,
                         // Destination: unloading, both doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true
+                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
                     }
                 ]
             },
@@ -1004,27 +1092,27 @@
                     {
                         name: 'Bremen Port', country: 'Germany', lat: 53.1050, lon: 8.8074, speed: 0,
                         // Loading: multi-zone refrigerated cargo, doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -5, temp2: 15, temp3: 2, coupled: true
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -5, temp2: 15, temp3: 2, coupled: true, isMoving: false
                     },
                     {
                         name: 'Hannover', country: 'Germany', lat: 52.3744, lon: 9.7318, speed: 40,
                         // En route: doors closed, maintaining different zone temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -8, temp2: 12, temp3: 0, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -8, temp2: 12, temp3: 0, coupled: true, isMoving: true
                     },
                     {
                         name: 'Frankfurt', country: 'Germany', lat: 50.1109, lon: 8.6821, speed: 50,
                         // En route: stable multi-zone temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true, isMoving: true
                     },
                     {
                         name: 'Nürnberg', country: 'Germany', lat: 49.4521, lon: 11.0767, speed: 55,
                         // En route: maintaining temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true
+                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true, isMoving: true
                     },
                     {
                         name: 'Munich', country: 'Germany', lat: 48.1351, lon: 11.5820, speed: 30,
                         // Destination: unloading, doors open, temps rising slightly
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -7, temp2: 12, temp3: 0, coupled: true
+                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -7, temp2: 12, temp3: 0, coupled: true, isMoving: true
                     }
                 ]
             }
@@ -1149,7 +1237,23 @@
 
             // Restore last session if available
             restoreLastSession();
-            
+
+            // Load default sensor data from localStorage
+            const savedDefaults = localStorage.getItem('defaultSensorData');
+            if (savedDefaults) {
+                state.defaultSensorData = JSON.parse(savedDefaults);
+
+                // Populate UI
+                document.getElementById('defaultReeferOn').checked = state.defaultSensorData.reeferOn;
+                document.getElementById('defaultTemp1').value = state.defaultSensorData.temp1;
+                document.getElementById('defaultTemp2').value = state.defaultSensorData.temp2;
+                document.getElementById('defaultTemp3').value = state.defaultSensorData.temp3;
+                document.getElementById('defaultDoorOpen').checked = state.defaultSensorData.doorOpen;
+                document.getElementById('defaultDoorOpen2').checked = state.defaultSensorData.doorOpen2;
+                document.getElementById('defaultCoupled').checked = state.defaultSensorData.coupled;
+                document.getElementById('defaultIsMoving').checked = state.defaultSensorData.isMoving;
+            }
+
             // Setup event delegation for better performance
             setupEventDelegation();
         });
@@ -1243,6 +1347,31 @@
             updateLocationDisplay();
         }
 
+        function updateDefaultSensorData() {
+            state.defaultSensorData = {
+                reeferOn: document.getElementById('defaultReeferOn').checked,
+                temp1: parseFloat(document.getElementById('defaultTemp1').value) || 20,
+                temp2: parseFloat(document.getElementById('defaultTemp2').value) || 20,
+                temp3: parseFloat(document.getElementById('defaultTemp3').value) || 20,
+                doorOpen: document.getElementById('defaultDoorOpen').checked,
+                doorOpen2: document.getElementById('defaultDoorOpen2').checked,
+                coupled: document.getElementById('defaultCoupled').checked,
+                isMoving: document.getElementById('defaultIsMoving').checked
+            };
+
+            // Save to localStorage for persistence across sessions
+            localStorage.setItem('defaultSensorData', JSON.stringify(state.defaultSensorData));
+
+            // Collapse the section after applying
+            const detailsElement = document.getElementById('defaultReeferOn').closest('details');
+            if (detailsElement) {
+                detailsElement.open = false;
+            }
+
+            // Provide user feedback
+            addLog('✓ Default sensor values applied successfully', 'success');
+        }
+
         function requestLocationPermission() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -1296,6 +1425,7 @@
             const doorOpen = document.getElementById('wpDoorOpen').checked;
             const doorOpen2 = document.getElementById('wpDoorOpen2').checked;
             const coupled = document.getElementById('wpCoupled').checked;
+            const isMoving = document.getElementById('wpIsMoving').checked;
 
             // Clear previous validation states
             document.getElementById('wpName').style.borderColor = '';
@@ -1343,7 +1473,8 @@
                 temp3,
                 doorOpen,
                 doorOpen2,
-                coupled
+                coupled,
+                isMoving
             };
 
             state.customWaypoints.push(newWaypoint);
@@ -1365,8 +1496,9 @@
                 const idx = currentCount - 1;
                 const sensors = [];
                 if (newWaypoint.reeferOn) sensors.push('❄️ Reefer');
-                if (newWaypoint.doorOpen) sensors.push('🚪 Door1');
-                if (newWaypoint.doorOpen2) sensors.push('🚪 Door2');
+                if (newWaypoint.doorOpen) sensors.push('🚪 Door1 Open');
+                if (newWaypoint.doorOpen2) sensors.push('🚪 Door2 Open');
+                if (newWaypoint.isMoving) sensors.push('🚗 In Motion');
                 if (newWaypoint.coupled === false) sensors.push('⚠️ Uncoupled');
                 if (newWaypoint.reeferOn && (newWaypoint.temp1 !== 20 || newWaypoint.temp2 !== 20 || newWaypoint.temp3 !== 20)) {
                     sensors.push(`🌡️ ${newWaypoint.temp1}°/${newWaypoint.temp2}°/${newWaypoint.temp3}°C`);
@@ -1412,12 +1544,13 @@
 
             // Clear sensor fields (reset to defaults)
             document.getElementById('wpReeferOn').checked = false;
-            document.getElementById('wpTemp1').value = '20';
-            document.getElementById('wpTemp2').value = '20';
-            document.getElementById('wpTemp3').value = '20';
+            document.getElementById('wpTemp1').value = '0';
+            document.getElementById('wpTemp2').value = '0';
+            document.getElementById('wpTemp3').value = '0';
             document.getElementById('wpDoorOpen').checked = false;
             document.getElementById('wpDoorOpen2').checked = false;
             document.getElementById('wpCoupled').checked = true;
+            document.getElementById('wpIsMoving').checked = true;
 
             addLog(`✓ Waypoint added: ${name} (${currentCount} total)`, 'success');
             perfEnd('addWaypoint');
@@ -1454,8 +1587,9 @@
                 // Build sensor status indicators (only show if non-default)
                 const sensors = [];
                 if (wp.reeferOn) sensors.push('❄️ Reefer');
-                if (wp.doorOpen) sensors.push('🚪 Door1');
-                if (wp.doorOpen2) sensors.push('🚪 Door2');
+                if (wp.doorOpen) sensors.push('🚪 Door1 Open');
+                if (wp.doorOpen2) sensors.push('🚪 Door2 Open');
+                if (wp.isMoving !== false) sensors.push('🚗 In Motion');  // Show by default (true unless explicitly false)
                 if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
                 if (wp.reeferOn && (wp.temp1 !== 20 || wp.temp2 !== 20 || wp.temp3 !== 20)) {
                     sensors.push(`🌡️ ${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`);
@@ -1637,17 +1771,19 @@
                         reeferOn: f.properties?.reeferOn !== undefined ? f.properties.reeferOn :
                                   (f.properties?.BD_REEFER_ON !== undefined ? f.properties.BD_REEFER_ON : false),
                         temp1: f.properties?.temp1 !== undefined ? f.properties.temp1 :
-                               (f.properties?.BD_TEMP1 !== undefined ? f.properties.BD_TEMP1 : 20),
+                               (f.properties?.BD_TEMP1 !== undefined ? f.properties.BD_TEMP1 : 0),
                         temp2: f.properties?.temp2 !== undefined ? f.properties.temp2 :
-                               (f.properties?.BD_TEMP2 !== undefined ? f.properties.BD_TEMP2 : 20),
+                               (f.properties?.BD_TEMP2 !== undefined ? f.properties.BD_TEMP2 : 0),
                         temp3: f.properties?.temp3 !== undefined ? f.properties.temp3 :
-                               (f.properties?.BD_TEMP3 !== undefined ? f.properties.BD_TEMP3 : 20),
+                               (f.properties?.BD_TEMP3 !== undefined ? f.properties.BD_TEMP3 : 0),
                         doorOpen: f.properties?.doorOpen !== undefined ? f.properties.doorOpen :
                                   (f.properties?.BD_DOOR_OPEN !== undefined ? f.properties.BD_DOOR_OPEN : false),
                         doorOpen2: f.properties?.doorOpen2 !== undefined ? f.properties.doorOpen2 :
                                    (f.properties?.BD_DOOR_OPEN_2 !== undefined ? f.properties.BD_DOOR_OPEN_2 : false),
                         coupled: f.properties?.coupled !== undefined ? f.properties.coupled :
-                                 (f.properties?.BD_COUPLED !== undefined ? f.properties.BD_COUPLED : true)
+                                 (f.properties?.BD_COUPLED !== undefined ? f.properties.BD_COUPLED : true),
+                        isMoving: f.properties?.isMoving !== undefined ? f.properties.isMoving :
+                                  (f.properties?.BD_IS_MOVING !== undefined ? f.properties.BD_IS_MOVING : true)
                     }));
                 }
                 // Handle LineString geometry (direct object)
@@ -1903,18 +2039,24 @@
                             <div style="display: flex; gap: 12px; margin-bottom: 8px;">
                                 <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
                                     <input type="checkbox" id="insert-doorOpen--1" style="width: auto;">
-                                    <span>Door 1</span>
+                                    <span>Door 1 Open</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
                                     <input type="checkbox" id="insert-doorOpen2--1" style="width: auto;">
-                                    <span>Door 2</span>
+                                    <span>Door 2 Open</span>
                                 </label>
                             </div>
-                            <!-- Coupling -->
-                            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                                <input type="checkbox" id="insert-coupled--1" checked style="width: auto;">
-                                <span>Coupled</span>
-                            </label>
+                            <!-- Coupling & Motion -->
+                            <div style="display: flex; gap: 12px;">
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-coupled--1" checked style="width: auto;">
+                                    <span>Coupled</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-isMoving--1" checked style="width: auto;">
+                                    <span>In Motion</span>
+                                </label>
+                            </div>
                         </div>
                     </details>
 
@@ -1935,10 +2077,11 @@
                 }
                 if (wp.doorOpen || wp.doorOpen2) {
                     const doors = [];
-                    if (wp.doorOpen) doors.push('Door1');
-                    if (wp.doorOpen2) doors.push('Door2');
-                    sensors.push(`🚪 ${doors.join('+')}`);
+                    if (wp.doorOpen) doors.push('Door1 Open');
+                    if (wp.doorOpen2) doors.push('Door2 Open');
+                    sensors.push(`🚪 ${doors.join(' + ')}`);
                 }
+                if (wp.isMoving !== false) sensors.push('🚗 In Motion');  // Show by default (true unless explicitly false)
                 if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
 
                 const sensorInfo = sensors.length > 0
@@ -1975,11 +2118,15 @@
                             </label>
                         </div>
 
-                        <!-- Coupling Section -->
-                        <div style="margin-bottom: 12px;">
+                        <!-- Coupling & Motion Section -->
+                        <div style="display: flex; gap: 16px; margin-bottom: 12px;">
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
                                 <input type="checkbox" id="edit-coupled-${i}" ${wp.coupled !== false ? 'checked' : ''} style="width: auto;">
                                 <span>Coupled to Tractor</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                                <input type="checkbox" id="edit-isMoving-${i}" ${wp.isMoving !== false ? 'checked' : ''} style="width: auto;">
+                                <span>In Motion</span>
                             </label>
                         </div>
 
@@ -2032,18 +2179,24 @@
                                 <div style="display: flex; gap: 12px; margin-bottom: 8px;">
                                     <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
                                         <input type="checkbox" id="insert-doorOpen-${i}" style="width: auto;">
-                                        <span>Door 1</span>
+                                        <span>Door 1 Open</span>
                                     </label>
                                     <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
                                         <input type="checkbox" id="insert-doorOpen2-${i}" style="width: auto;">
-                                        <span>Door 2</span>
+                                        <span>Door 2 Open</span>
                                     </label>
                                 </div>
-                                <!-- Coupling -->
-                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                                    <input type="checkbox" id="insert-coupled-${i}" checked style="width: auto;">
-                                    <span>Coupled</span>
-                                </label>
+                                <!-- Coupling & Motion -->
+                                <div style="display: flex; gap: 12px;">
+                                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                        <input type="checkbox" id="insert-coupled-${i}" checked style="width: auto;">
+                                        <span>Coupled</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                        <input type="checkbox" id="insert-isMoving-${i}" checked style="width: auto;">
+                                        <span>In Motion</span>
+                                    </label>
+                                </div>
                             </div>
                         </details>
 
@@ -2382,10 +2535,11 @@
             }
             if (wp.doorOpen || wp.doorOpen2) {
                 const doors = [];
-                if (wp.doorOpen) doors.push('Door1');
-                if (wp.doorOpen2) doors.push('Door2');
-                sensors.push(`🚪 ${doors.join('+')}`);
+                if (wp.doorOpen) doors.push('Door1 Open');
+                if (wp.doorOpen2) doors.push('Door2 Open');
+                sensors.push(`🚪 ${doors.join(' + ')}`);
             }
+            if (wp.isMoving !== false) sensors.push('🚗 In Motion');  // Show by default (true unless explicitly false)
             if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
 
             const sensorInfo = sensors.length > 0
@@ -2511,10 +2665,14 @@
                         </label>
                     </div>
 
-                    <div style="margin-bottom: 12px;">
+                    <div style="display: flex; gap: 16px; margin-bottom: 12px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
                             <input type="checkbox" id="edit-coupled-${i}" ${wp.coupled !== false ? 'checked' : ''} style="width: auto;">
                             <span>Coupled to Tractor</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                            <input type="checkbox" id="edit-isMoving-${i}" ${wp.isMoving !== false ? 'checked' : ''} style="width: auto;">
+                            <span>In Motion</span>
                         </label>
                     </div>
 
@@ -2564,17 +2722,23 @@
                             <div style="display: flex; gap: 12px; margin-bottom: 8px;">
                                 <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
                                     <input type="checkbox" id="insert-doorOpen-${afterIdx}" style="width: auto;">
-                                    <span>Door 1</span>
+                                    <span>Door 1 Open</span>
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
                                     <input type="checkbox" id="insert-doorOpen2-${afterIdx}" style="width: auto;">
-                                    <span>Door 2</span>
+                                    <span>Door 2 Open</span>
                                 </label>
                             </div>
-                            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                                <input type="checkbox" id="insert-coupled-${afterIdx}" checked style="width: auto;">
-                                <span>Coupled</span>
-                            </label>
+                            <div style="display: flex; gap: 12px;">
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-coupled-${afterIdx}" checked style="width: auto;">
+                                    <span>Coupled</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                                    <input type="checkbox" id="insert-isMoving-${afterIdx}" checked style="width: auto;">
+                                    <span>In Motion</span>
+                                </label>
+                            </div>
                         </div>
                     </details>
 
@@ -2669,6 +2833,7 @@
             wp.doorOpen = document.getElementById(`edit-doorOpen-${waypointIdx}`).checked;
             wp.doorOpen2 = document.getElementById(`edit-doorOpen2-${waypointIdx}`).checked;
             wp.coupled = document.getElementById(`edit-coupled-${waypointIdx}`).checked;
+            wp.isMoving = document.getElementById(`edit-isMoving-${waypointIdx}`).checked;
 
             // Close edit form
             state.editingWaypointIdx = null;
@@ -2960,7 +3125,7 @@
             }
 
             // Read sensor properties with error handling
-            let reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled;
+            let reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled, isMoving;
             try {
                 const reeferOnEl = document.getElementById(`insert-reeferOn-${afterIdx}`);
                 const temp1El = document.getElementById(`insert-temp1-${afterIdx}`);
@@ -2969,8 +3134,9 @@
                 const doorOpenEl = document.getElementById(`insert-doorOpen-${afterIdx}`);
                 const doorOpen2El = document.getElementById(`insert-doorOpen2-${afterIdx}`);
                 const coupledEl = document.getElementById(`insert-coupled-${afterIdx}`);
+                const isMovingEl = document.getElementById(`insert-isMoving-${afterIdx}`);
 
-                if (!reeferOnEl || !temp1El || !temp2El || !temp3El || !doorOpenEl || !doorOpen2El || !coupledEl) {
+                if (!reeferOnEl || !temp1El || !temp2El || !temp3El || !doorOpenEl || !doorOpen2El || !coupledEl || !isMovingEl) {
                     console.warn(`Sensor form elements not found for index ${afterIdx}. Using defaults.`);
                     console.warn('Expected IDs:', {
                         reeferOn: `insert-reeferOn-${afterIdx}`,
@@ -2979,7 +3145,8 @@
                         temp3: `insert-temp3-${afterIdx}`,
                         doorOpen: `insert-doorOpen-${afterIdx}`,
                         doorOpen2: `insert-doorOpen2-${afterIdx}`,
-                        coupled: `insert-coupled-${afterIdx}`
+                        coupled: `insert-coupled-${afterIdx}`,
+                        isMoving: `insert-isMoving-${afterIdx}`
                     });
                     throw new Error(`Sensor form elements not found for index ${afterIdx}`);
                 }
@@ -2991,9 +3158,10 @@
                 doorOpen = doorOpenEl.checked;
                 doorOpen2 = doorOpen2El.checked;
                 coupled = coupledEl.checked;
+                isMoving = isMovingEl.checked;
 
                 console.log(`Successfully read sensor properties for index ${afterIdx}:`, {
-                    reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled
+                    reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled, isMoving
                 });
             } catch (error) {
                 console.error('Error reading sensor properties:', error);
@@ -3006,6 +3174,7 @@
                 doorOpen = false;
                 doorOpen2 = false;
                 coupled = true;
+                isMoving = false;
             }
 
             // Get reference waypoint for country inheritance
@@ -3051,7 +3220,8 @@
                 temp3,
                 doorOpen,
                 doorOpen2,
-                coupled
+                coupled,
+                isMoving
             };
 
             console.log('New waypoint created:', newWaypoint);
@@ -3296,29 +3466,22 @@
                 state.currentSpeed = speed;
                 updateLocationDisplay();
 
-                // Extract sensor properties from waypoint (with fallback to defaults)
+                // Extract sensor properties from waypoint (with fallback to configured defaults)
                 sensorData = {
-                    reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : false,
-                    temp1: wp.temp1 !== undefined ? wp.temp1 : 20,
-                    temp2: wp.temp2 !== undefined ? wp.temp2 : 20,
-                    temp3: wp.temp3 !== undefined ? wp.temp3 : 20,
-                    doorOpen: wp.doorOpen !== undefined ? wp.doorOpen : false,
-                    doorOpen2: wp.doorOpen2 !== undefined ? wp.doorOpen2 : false,
-                    coupled: wp.coupled !== undefined ? wp.coupled : true
+                    reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : state.defaultSensorData.reeferOn,
+                    temp1: wp.temp1 !== undefined ? wp.temp1 : state.defaultSensorData.temp1,
+                    temp2: wp.temp2 !== undefined ? wp.temp2 : state.defaultSensorData.temp2,
+                    temp3: wp.temp3 !== undefined ? wp.temp3 : state.defaultSensorData.temp3,
+                    doorOpen: wp.doorOpen !== undefined ? wp.doorOpen : state.defaultSensorData.doorOpen,
+                    doorOpen2: wp.doorOpen2 !== undefined ? wp.doorOpen2 : state.defaultSensorData.doorOpen2,
+                    coupled: wp.coupled !== undefined ? wp.coupled : state.defaultSensorData.coupled,
+                    isMoving: wp.isMoving !== undefined ? wp.isMoving : state.defaultSensorData.isMoving
                 };
             }
 
-            // For live/static modes, use default sensor values
+            // For live/static modes, use configured default sensor values
             if (state.simMode === 'live' || state.simMode === 'static') {
-                sensorData = {
-                    reeferOn: false,
-                    temp1: 20,
-                    temp2: 20,
-                    temp3: 20,
-                    doorOpen: false,
-                    doorOpen2: false,
-                    coupled: true
-                };
+                sensorData = { ...state.defaultSensorData };
             }
 
             const payload = {
@@ -3340,7 +3503,7 @@
                         BD_TIME: Date.now(),
                         BD_TIME_RECEIVED: Date.now(),
                         BD_DATA_TYPE: 0,
-                        BD_IS_MOVING: speed > 5,
+                        BD_IS_MOVING: sensorData.isMoving,
                         BD_COUPLED: sensorData.coupled,
                         BD_DURATION_DRIVING: 1760361300000,
                         vehicle: {
