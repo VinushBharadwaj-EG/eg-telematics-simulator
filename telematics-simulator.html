@@ -1012,108 +1012,36 @@
                 name: 'Copenhagen → Hamburg (North Sea Corridor)',
                 distance: 420,
                 waypoints: [
-                    {
-                        name: 'Copenhagen Port', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0,
-                        // Loading scenario: doors open, reefer starting
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 18, temp2: 18, temp3: 18, coupled: true, isMoving: false
-                    },
-                    {
-                        name: 'Roskilde', country: 'Denmark', lat: 55.6419, lon: 12.0820, speed: 30,
-                        // En route: doors closed, reefer cooling
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 5, temp2: 5, temp3: 5, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Kolding', country: 'Denmark', lat: 55.4784, lon: 9.4922, speed: 45,
-                        // En route: optimal temps reached
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Flensburg', country: 'Germany', lat: 54.7688, lon: 9.4342, speed: 50,
-                        // Border crossing: stopped for inspection, one door open
-                        doorOpen: true, doorOpen2: false, reeferOn: true, temp1: 3, temp2: 3, temp3: 3, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Kiel', country: 'Germany', lat: 54.3233, lon: 10.1350, speed: 55,
-                        // En route: stable temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Lübeck Port', country: 'Germany', lat: 53.8705, lon: 10.8734, speed: 40,
-                        // En route: stable temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: 2, temp2: 2, temp3: 2, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Hamburg Port', country: 'Germany', lat: 53.5461, lon: 9.9922, speed: 20,
-                        // Destination: unloading, doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: 4, temp2: 4, temp3: 4, coupled: true, isMoving: true
-                    }
+                    { name: 'Copenhagen Port', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0, type: 'Port' },
+                    { name: 'Roskilde', country: 'Denmark', lat: 55.6419, lon: 12.0820, speed: 30, type: 'Waypoint' },
+                    { name: 'Kolding', country: 'Denmark', lat: 55.4784, lon: 9.4922, speed: 45, type: 'Waypoint' },
+                    { name: 'Flensburg', country: 'Germany', lat: 54.7688, lon: 9.4342, speed: 50, type: 'Border' },
+                    { name: 'Kiel', country: 'Germany', lat: 54.3233, lon: 10.1350, speed: 55, type: 'Waypoint' },
+                    { name: 'Lübeck Port', country: 'Germany', lat: 53.8705, lon: 10.8734, speed: 40, type: 'Port' },
+                    { name: 'Hamburg Port', country: 'Germany', lat: 53.5461, lon: 9.9922, speed: 20, type: 'Port' }
                 ]
             },
             'copenhagen_warsaw': {
                 name: 'Copenhagen → Warsaw (Eastern Europe)',
                 distance: 850,
                 waypoints: [
-                    {
-                        name: 'Copenhagen', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0,
-                        // Loading: non-refrigerated cargo, doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: false
-                    },
-                    {
-                        name: 'Odense', country: 'Denmark', lat: 55.4015, lon: 10.3918, speed: 30,
-                        // En route: doors closed, ambient temp
-                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Malmö', country: 'Sweden', lat: 55.6050, lon: 13.0061, speed: 40,
-                        // Ferry crossing: stable
-                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Stockholm', country: 'Sweden', lat: 59.3293, lon: 18.0686, speed: 45,
-                        // Rest stop: one door open for inspection
-                        doorOpen: true, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Gdańsk', country: 'Poland', lat: 54.3720, lon: 18.6466, speed: 50,
-                        // En route: doors closed
-                        doorOpen: false, doorOpen2: false, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Warsaw', country: 'Poland', lat: 52.2297, lon: 21.0122, speed: 30,
-                        // Destination: unloading, both doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: false, temp1: 20, temp2: 20, temp3: 20, coupled: true, isMoving: true
-                    }
+                    { name: 'Copenhagen', country: 'Denmark', lat: 55.6761, lon: 12.5681, speed: 0, type: 'Port' },
+                    { name: 'Odense', country: 'Denmark', lat: 55.4015, lon: 10.3918, speed: 30, type: 'Waypoint' },
+                    { name: 'Malmö', country: 'Sweden', lat: 55.6050, lon: 13.0061, speed: 40, type: 'Waypoint' },
+                    { name: 'Stockholm', country: 'Sweden', lat: 59.3293, lon: 18.0686, speed: 45, type: 'Stop' },
+                    { name: 'Gdańsk', country: 'Poland', lat: 54.3720, lon: 18.6466, speed: 50, type: 'Waypoint' },
+                    { name: 'Warsaw', country: 'Poland', lat: 52.2297, lon: 21.0122, speed: 30, type: 'Port' }
                 ]
             },
             'bremen_munich': {
                 name: 'Bremen → Munich (Central Europe)',
                 distance: 680,
                 waypoints: [
-                    {
-                        name: 'Bremen Port', country: 'Germany', lat: 53.1050, lon: 8.8074, speed: 0,
-                        // Loading: multi-zone refrigerated cargo, doors open
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -5, temp2: 15, temp3: 2, coupled: true, isMoving: false
-                    },
-                    {
-                        name: 'Hannover', country: 'Germany', lat: 52.3744, lon: 9.7318, speed: 40,
-                        // En route: doors closed, maintaining different zone temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -8, temp2: 12, temp3: 0, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Frankfurt', country: 'Germany', lat: 50.1109, lon: 8.6821, speed: 50,
-                        // En route: stable multi-zone temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Nürnberg', country: 'Germany', lat: 49.4521, lon: 11.0767, speed: 55,
-                        // En route: maintaining temps
-                        doorOpen: false, doorOpen2: false, reeferOn: true, temp1: -10, temp2: 10, temp3: -2, coupled: true, isMoving: true
-                    },
-                    {
-                        name: 'Munich', country: 'Germany', lat: 48.1351, lon: 11.5820, speed: 30,
-                        // Destination: unloading, doors open, temps rising slightly
-                        doorOpen: true, doorOpen2: true, reeferOn: true, temp1: -7, temp2: 12, temp3: 0, coupled: true, isMoving: true
-                    }
+                    { name: 'Bremen Port', country: 'Germany', lat: 53.1050, lon: 8.8074, speed: 0, type: 'Port' },
+                    { name: 'Hannover', country: 'Germany', lat: 52.3744, lon: 9.7318, speed: 40, type: 'Waypoint' },
+                    { name: 'Frankfurt', country: 'Germany', lat: 50.1109, lon: 8.6821, speed: 50, type: 'Waypoint' },
+                    { name: 'Nürnberg', country: 'Germany', lat: 49.4521, lon: 11.0767, speed: 55, type: 'Waypoint' },
+                    { name: 'Munich', country: 'Germany', lat: 48.1351, lon: 11.5820, speed: 30, type: 'Port' }
                 ]
             }
         };
@@ -1214,6 +1142,41 @@
             }
         }
 
+        // Migrate waypoint sensor properties to explicit override system (backward compatibility)
+        function migrateWaypointOverrides() {
+            let needsSave = false;
+
+            Object.entries(state.routes).forEach(([key, route]) => {
+                route.waypoints.forEach(wp => {
+                    // Skip if already migrated
+                    if (wp.hasOverride !== undefined) {
+                        return;
+                    }
+
+                    // Check if any sensor property is defined (legacy override)
+                    const hasSensorProps =
+                        wp.reeferOn !== undefined ||
+                        wp.temp1 !== undefined ||
+                        wp.temp2 !== undefined ||
+                        wp.temp3 !== undefined ||
+                        wp.doorOpen !== undefined ||
+                        wp.doorOpen2 !== undefined ||
+                        wp.coupled !== undefined ||
+                        wp.isMoving !== undefined;
+
+                    if (hasSensorProps) {
+                        wp.hasOverride = true;  // Migrate legacy override
+                        needsSave = true;
+                    }
+                });
+            });
+
+            if (needsSave) {
+                localStorage.setItem('customRoutes', JSON.stringify(state.routes));
+                addLog('✓ Waypoint overrides migrated to explicit system', 'info');
+            }
+        }
+
         // Initialize
         window.addEventListener('load', () => {
             loadSettings();
@@ -1225,6 +1188,9 @@
 
             // Migrate existing routes to add metadata
             migrateRoutesMetadata();
+
+            // Migrate waypoint overrides to explicit system
+            migrateWaypointOverrides();
 
             // Render GeoJSON routes list
             if (typeof renderGeoJSONRoutes === 'function') {
@@ -1308,6 +1274,9 @@
                 switch (action) {
                     case 'edit-waypoint':
                         editWaypoint(index);
+                        break;
+                    case 'clear-override':
+                        clearWaypointOverride(index);
                         break;
                     case 'insert-waypoint-before':
                         insertWaypointBefore(index);
@@ -1458,6 +1427,17 @@
                 return;
             }
 
+            // Check if ANY sensor value differs from defaults
+            const hasSensorOverride =
+                reeferOn !== state.defaultSensorData.reeferOn ||
+                temp1 !== state.defaultSensorData.temp1 ||
+                temp2 !== state.defaultSensorData.temp2 ||
+                temp3 !== state.defaultSensorData.temp3 ||
+                doorOpen !== state.defaultSensorData.doorOpen ||
+                doorOpen2 !== state.defaultSensorData.doorOpen2 ||
+                coupled !== state.defaultSensorData.coupled ||
+                isMoving !== state.defaultSensorData.isMoving;
+
             const newWaypoint = {
                 name,
                 city,
@@ -1465,17 +1445,21 @@
                 lat,
                 lon,
                 speed,
-                type,
-                // Sensor properties
-                reeferOn,
-                temp1,
-                temp2,
-                temp3,
-                doorOpen,
-                doorOpen2,
-                coupled,
-                isMoving
+                type
             };
+
+            // Only add sensor properties and override flag if user set non-defaults
+            if (hasSensorOverride) {
+                newWaypoint.hasOverride = true;
+                newWaypoint.reeferOn = reeferOn;
+                newWaypoint.temp1 = temp1;
+                newWaypoint.temp2 = temp2;
+                newWaypoint.temp3 = temp3;
+                newWaypoint.doorOpen = doorOpen;
+                newWaypoint.doorOpen2 = doorOpen2;
+                newWaypoint.coupled = coupled;
+                newWaypoint.isMoving = isMoving;
+            }
 
             state.customWaypoints.push(newWaypoint);
             
@@ -1584,20 +1568,28 @@
             const tempDiv = document.createElement('div');
             
             const html = state.customWaypoints.slice(0, currentEnd).map((wp, idx) => {
-                // Build sensor status indicators (only show if non-default)
-                const sensors = [];
-                if (wp.reeferOn) sensors.push('❄️ Reefer');
-                if (wp.doorOpen) sensors.push('🚪 Door1 Open');
-                if (wp.doorOpen2) sensors.push('🚪 Door2 Open');
-                if (wp.isMoving !== false) sensors.push('🚗 In Motion');  // Show by default (true unless explicitly false)
-                if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
-                if (wp.reeferOn && (wp.temp1 !== 20 || wp.temp2 !== 20 || wp.temp3 !== 20)) {
-                    sensors.push(`🌡️ ${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`);
-                }
+                // Build sensor status badge based on override status
+                let sensorBadge = '';
+                if (!wp.hasOverride) {
+                    // Using defaults - show subtle indicator
+                    sensorBadge = '<span style="color: #6b7280; font-size: 0.85em;">⚙️ Using Defaults</span>';
+                } else {
+                    // Has override - build sensor badge list
+                    const badges = [];
+                    if (wp.reeferOn) {
+                        const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
+                        badges.push(`❄️ ${temps}`);
+                    }
+                    const doors = [];
+                    if (wp.doorOpen) doors.push('Door1 Open');
+                    if (wp.doorOpen2) doors.push('Door2 Open');
+                    if (doors.length > 0) badges.push(`🚪 ${doors.join(' + ')}`);
+                    if (wp.coupled === false) badges.push('⚠️ Uncoupled');
+                    if (wp.isMoving !== false) badges.push('🚗 In Motion');
 
-                const sensorBadge = sensors.length > 0
-                    ? `<div style="margin-top: 4px; font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</div>`
-                    : '';
+                    const badgeHTML = badges.join(' • ');
+                    sensorBadge = `<span style="background: #dbeafe; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">🎯 Override: ${badgeHTML || 'Active'}</span>`;
+                }
 
                 return `
                     <div class="waypoint-item">
@@ -1759,32 +1751,53 @@
                 }
                 // Handle FeatureCollection (Point geometries)
                 else if (data.type === 'FeatureCollection' && data.features) {
-                    waypoints = data.features.map(f => ({
-                        name: f.properties?.name || 'Unknown',
-                        city: f.properties?.city || f.properties?.name || '',
-                        country: f.properties?.country || f.properties?.city || 'Unknown',
-                        lat: f.geometry.coordinates[1],
-                        lon: f.geometry.coordinates[0],
-                        speed: f.properties?.speed || 30,
-                        type: f.properties?.type || 'Waypoint',
-                        // Map sensor properties from GeoJSON (support both camelCase and snake_case)
-                        reeferOn: f.properties?.reeferOn !== undefined ? f.properties.reeferOn :
-                                  (f.properties?.BD_REEFER_ON !== undefined ? f.properties.BD_REEFER_ON : false),
-                        temp1: f.properties?.temp1 !== undefined ? f.properties.temp1 :
-                               (f.properties?.BD_TEMP1 !== undefined ? f.properties.BD_TEMP1 : 0),
-                        temp2: f.properties?.temp2 !== undefined ? f.properties.temp2 :
-                               (f.properties?.BD_TEMP2 !== undefined ? f.properties.BD_TEMP2 : 0),
-                        temp3: f.properties?.temp3 !== undefined ? f.properties.temp3 :
-                               (f.properties?.BD_TEMP3 !== undefined ? f.properties.BD_TEMP3 : 0),
-                        doorOpen: f.properties?.doorOpen !== undefined ? f.properties.doorOpen :
-                                  (f.properties?.BD_DOOR_OPEN !== undefined ? f.properties.BD_DOOR_OPEN : false),
-                        doorOpen2: f.properties?.doorOpen2 !== undefined ? f.properties.doorOpen2 :
-                                   (f.properties?.BD_DOOR_OPEN_2 !== undefined ? f.properties.BD_DOOR_OPEN_2 : false),
-                        coupled: f.properties?.coupled !== undefined ? f.properties.coupled :
-                                 (f.properties?.BD_COUPLED !== undefined ? f.properties.BD_COUPLED : true),
-                        isMoving: f.properties?.isMoving !== undefined ? f.properties.isMoving :
-                                  (f.properties?.BD_IS_MOVING !== undefined ? f.properties.BD_IS_MOVING : true)
-                    }));
+                    waypoints = data.features.map(f => {
+                        const props = f.properties || {};
+
+                        // Check if GeoJSON has sensor properties (either naming convention)
+                        const hasSensorProps =
+                            props.reeferOn !== undefined || props.BD_REEFER_ON !== undefined ||
+                            props.temp1 !== undefined || props.BD_TEMP1 !== undefined ||
+                            props.temp2 !== undefined || props.BD_TEMP2 !== undefined ||
+                            props.temp3 !== undefined || props.BD_TEMP3 !== undefined ||
+                            props.doorOpen !== undefined || props.BD_DOOR_OPEN !== undefined ||
+                            props.doorOpen2 !== undefined || props.BD_DOOR_OPEN_2 !== undefined ||
+                            props.coupled !== undefined || props.BD_COUPLED !== undefined ||
+                            props.isMoving !== undefined || props.BD_IS_MOVING !== undefined;
+
+                        const waypoint = {
+                            name: props.name || 'Unknown',
+                            city: props.city || props.name || '',
+                            country: props.country || props.city || 'Unknown',
+                            lat: f.geometry.coordinates[1],
+                            lon: f.geometry.coordinates[0],
+                            speed: props.speed || 30,
+                            type: props.type || 'Waypoint'
+                        };
+
+                        // Only add sensor properties if they exist in GeoJSON
+                        if (hasSensorProps) {
+                            waypoint.hasOverride = true;
+                            waypoint.reeferOn = props.reeferOn !== undefined ? props.reeferOn :
+                                              (props.BD_REEFER_ON !== undefined ? props.BD_REEFER_ON : false);
+                            waypoint.temp1 = props.temp1 !== undefined ? props.temp1 :
+                                           (props.BD_TEMP1 !== undefined ? props.BD_TEMP1 : 0);
+                            waypoint.temp2 = props.temp2 !== undefined ? props.temp2 :
+                                           (props.BD_TEMP2 !== undefined ? props.BD_TEMP2 : 0);
+                            waypoint.temp3 = props.temp3 !== undefined ? props.temp3 :
+                                           (props.BD_TEMP3 !== undefined ? props.BD_TEMP3 : 0);
+                            waypoint.doorOpen = props.doorOpen !== undefined ? props.doorOpen :
+                                              (props.BD_DOOR_OPEN !== undefined ? props.BD_DOOR_OPEN : false);
+                            waypoint.doorOpen2 = props.doorOpen2 !== undefined ? props.doorOpen2 :
+                                               (props.BD_DOOR_OPEN_2 !== undefined ? props.BD_DOOR_OPEN_2 : false);
+                            waypoint.coupled = props.coupled !== undefined ? props.coupled :
+                                             (props.BD_COUPLED !== undefined ? props.BD_COUPLED : true);
+                            waypoint.isMoving = props.isMoving !== undefined ? props.isMoving :
+                                              (props.BD_IS_MOVING !== undefined ? props.BD_IS_MOVING : true);
+                        }
+
+                        return waypoint;
+                    });
                 }
                 // Handle LineString geometry (direct object)
                 else if (data.type === 'LineString' && Array.isArray(data.coordinates)) {
@@ -2069,24 +2082,28 @@
 
             // Render only visible waypoints (chunked)
             const waypointsHtml = route.waypoints.slice(0, currentEnd).map((wp, i) => {
-                // Build sensor status string (only show non-default values)
-                const sensors = [];
-                if (wp.reeferOn) {
-                    const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
-                    sensors.push(`❄️ ${temps}`);
-                }
-                if (wp.doorOpen || wp.doorOpen2) {
+                // Build sensor badge based on override status
+                let sensorInfo = '';
+                if (!wp.hasOverride) {
+                    // Using defaults - show subtle indicator
+                    sensorInfo = '<br><span style="color: #6b7280; font-size: 0.85em;">⚙️ Using Defaults</span>';
+                } else {
+                    // Has override - build sensor badge list
+                    const badges = [];
+                    if (wp.reeferOn) {
+                        const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
+                        badges.push(`❄️ ${temps}`);
+                    }
                     const doors = [];
                     if (wp.doorOpen) doors.push('Door1 Open');
                     if (wp.doorOpen2) doors.push('Door2 Open');
-                    sensors.push(`🚪 ${doors.join(' + ')}`);
-                }
-                if (wp.isMoving !== false) sensors.push('🚗 In Motion');  // Show by default (true unless explicitly false)
-                if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
+                    if (doors.length > 0) badges.push(`🚪 ${doors.join(' + ')}`);
+                    if (wp.coupled === false) badges.push('⚠️ Uncoupled');
+                    if (wp.isMoving !== false) badges.push('🚗 In Motion');
 
-                const sensorInfo = sensors.length > 0
-                    ? `<br><span style="font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</span>`
-                    : '';
+                    const badgeHTML = badges.join(' • ');
+                    sensorInfo = `<br><span style="background: #dbeafe; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">🎯 Override: ${badgeHTML || 'Active'}</span>`;
+                }
 
                 // Inline edit form (conditionally rendered)
                 const editForm = state.editingWaypointIdx === i ? `
@@ -2207,12 +2224,21 @@
                     </div>
                 ` : '';
 
-                // Action buttons
+                // Action buttons with dynamic labels based on override status
+                const hasOverride = wp.hasOverride === true;
+                const editLabel = hasOverride ? '✏️ Edit Override' : '➕ Add Override';
+                const clearOverrideBtn = hasOverride ? `
+                    <button class="btn btn-secondary btn-sm" onclick="clearWaypointOverride(${i})" style="background: #9ca3af;">
+                        ✕ Clear Override
+                    </button>
+                ` : '';
+
                 const actionButtons = `
                     <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="btn btn-secondary btn-sm" onclick="editWaypoint(${i})" ${state.editingWaypointIdx === i ? 'disabled' : ''}>
-                            ✏️ Edit Sensors
+                            ${editLabel}
                         </button>
+                        ${clearOverrideBtn}
                         ${i === 0 ? `
                             <button class="btn btn-secondary btn-sm" onclick="insertWaypointBefore(0)">
                                 ➕ Insert Before
@@ -2528,23 +2554,28 @@
 
         // Helper to render individual waypoint (reusable)
         function renderWaypointItem(wp, i, route) {
-            const sensors = [];
-            if (wp.reeferOn) {
-                const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
-                sensors.push(`❄️ ${temps}`);
-            }
-            if (wp.doorOpen || wp.doorOpen2) {
+            // Build sensor badge based on override status
+            let sensorInfo = '';
+            if (!wp.hasOverride) {
+                // Using defaults - show subtle indicator
+                sensorInfo = '<br><span style="color: #6b7280; font-size: 0.85em;">⚙️ Using Defaults</span>';
+            } else {
+                // Has override - build sensor badge list
+                const badges = [];
+                if (wp.reeferOn) {
+                    const temps = `${wp.temp1}°/${wp.temp2}°/${wp.temp3}°C`;
+                    badges.push(`❄️ ${temps}`);
+                }
                 const doors = [];
                 if (wp.doorOpen) doors.push('Door1 Open');
                 if (wp.doorOpen2) doors.push('Door2 Open');
-                sensors.push(`🚪 ${doors.join(' + ')}`);
-            }
-            if (wp.isMoving !== false) sensors.push('🚗 In Motion');  // Show by default (true unless explicitly false)
-            if (wp.coupled === false) sensors.push('⚠️ Uncoupled');
+                if (doors.length > 0) badges.push(`🚪 ${doors.join(' + ')}`);
+                if (wp.coupled === false) badges.push('⚠️ Uncoupled');
+                if (wp.isMoving !== false) badges.push('🚗 In Motion');
 
-            const sensorInfo = sensors.length > 0
-                ? `<br><span style="font-size: 11px; color: var(--color-primary);">${sensors.join(' • ')}</span>`
-                : '';
+                const badgeHTML = badges.join(' • ');
+                sensorInfo = `<br><span style="background: #dbeafe; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">🎯 Override: ${badgeHTML || 'Active'}</span>`;
+            }
 
             // Only render forms if this specific waypoint is being edited/inserted
             const editForm = state.editingWaypointIdx === i ? renderEditForm(wp, i) : '';
@@ -2560,11 +2591,21 @@
             } else if (isCurrent) {
                 actionButtons = '<p style="font-size: 11px; color: var(--color-warning); margin-top: 8px;">⏩ Currently sending...</p>';
             } else {
+                // Dynamic button label based on override status
+                const hasOverride = wp.hasOverride === true;
+                const editLabel = hasOverride ? '✏️ Edit Override' : '➕ Add Override';
+                const clearOverrideBtn = hasOverride ? `
+                    <button class="btn btn-secondary btn-sm" data-action="clear-override" data-index="${i}" style="background: #9ca3af;">
+                        ✕ Clear Override
+                    </button>
+                ` : '';
+
                 actionButtons = `
                     <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="btn btn-secondary btn-sm" data-action="edit-waypoint" data-index="${i}" ${state.editingWaypointIdx === i ? 'disabled' : ''}>
-                            ✏️ Edit Sensors
+                            ${editLabel}
                         </button>
+                        ${clearOverrideBtn}
                         ${i === 0 ? `
                             <button class="btn btn-secondary btn-sm" data-action="insert-waypoint-before" data-index="0">
                                 ➕ Insert Before
@@ -2835,6 +2876,9 @@
             wp.coupled = document.getElementById(`edit-coupled-${waypointIdx}`).checked;
             wp.isMoving = document.getElementById(`edit-isMoving-${waypointIdx}`).checked;
 
+            // Set override flag explicitly
+            wp.hasOverride = true;
+
             // Close edit form
             state.editingWaypointIdx = null;
 
@@ -2863,6 +2907,46 @@
             });
 
             addLog('✕ Waypoint edit cancelled', 'info');
+        }
+
+        function clearWaypointOverride(waypointIdx) {
+            perfStart('clearWaypointOverride');
+
+            if (!state.pendingRouteChanges) {
+                addLog('⚠ No route is being edited', 'error');
+                perfEnd('clearWaypointOverride');
+                return;
+            }
+
+            if (!confirm('Clear sensor override and use default values for this waypoint?')) {
+                perfEnd('clearWaypointOverride');
+                return;
+            }
+
+            const wp = state.pendingRouteChanges.waypoints[waypointIdx];
+
+            // Remove override flag and all sensor properties
+            wp.hasOverride = false;
+            delete wp.reeferOn;
+            delete wp.temp1;
+            delete wp.temp2;
+            delete wp.temp3;
+            delete wp.doorOpen;
+            delete wp.doorOpen2;
+            delete wp.coupled;
+            delete wp.isMoving;
+
+            // Schedule re-render to update sensor badges
+            scheduleUpdate(() => {
+                if (state.expandedGeoJSONRoute) {
+                    renderGeoJSONRoutes();
+                } else {
+                    updateRoutePreview();
+                }
+            });
+
+            addLog(`✓ Waypoint ${waypointIdx + 1} override cleared - using defaults`, 'success');
+            perfEnd('clearWaypointOverride');
         }
 
         function deleteWaypoint(waypointIdx) {
@@ -3466,17 +3550,23 @@
                 state.currentSpeed = speed;
                 updateLocationDisplay();
 
-                // Extract sensor properties from waypoint (with fallback to configured defaults)
-                sensorData = {
-                    reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : state.defaultSensorData.reeferOn,
-                    temp1: wp.temp1 !== undefined ? wp.temp1 : state.defaultSensorData.temp1,
-                    temp2: wp.temp2 !== undefined ? wp.temp2 : state.defaultSensorData.temp2,
-                    temp3: wp.temp3 !== undefined ? wp.temp3 : state.defaultSensorData.temp3,
-                    doorOpen: wp.doorOpen !== undefined ? wp.doorOpen : state.defaultSensorData.doorOpen,
-                    doorOpen2: wp.doorOpen2 !== undefined ? wp.doorOpen2 : state.defaultSensorData.doorOpen2,
-                    coupled: wp.coupled !== undefined ? wp.coupled : state.defaultSensorData.coupled,
-                    isMoving: wp.isMoving !== undefined ? wp.isMoving : state.defaultSensorData.isMoving
-                };
+                // Determine sensor data based on explicit override flag
+                if (wp.hasOverride === true) {
+                    // Use waypoint override values with fallback to defaults for missing properties
+                    sensorData = {
+                        reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : state.defaultSensorData.reeferOn,
+                        temp1: wp.temp1 !== undefined ? wp.temp1 : state.defaultSensorData.temp1,
+                        temp2: wp.temp2 !== undefined ? wp.temp2 : state.defaultSensorData.temp2,
+                        temp3: wp.temp3 !== undefined ? wp.temp3 : state.defaultSensorData.temp3,
+                        doorOpen: wp.doorOpen !== undefined ? wp.doorOpen : state.defaultSensorData.doorOpen,
+                        doorOpen2: wp.doorOpen2 !== undefined ? wp.doorOpen2 : state.defaultSensorData.doorOpen2,
+                        coupled: wp.coupled !== undefined ? wp.coupled : state.defaultSensorData.coupled,
+                        isMoving: wp.isMoving !== undefined ? wp.isMoving : state.defaultSensorData.isMoving
+                    };
+                } else {
+                    // No override - use defaults entirely
+                    sensorData = { ...state.defaultSensorData };
+                }
             }
 
             // For live/static modes, use configured default sensor values
