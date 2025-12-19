@@ -251,12 +251,18 @@ Complete rewrite implementing multi-strategy caching and background sync support
 - Automatically converts to internal waypoint format
 - FeatureCollection format supports sensor properties (see below)
 
-### Waypoint Sensor Properties
+### Waypoint Sensor Properties with Explicit Override System
 
 **Overview**:
-Each waypoint in Route-Based simulation can have configurable sensor properties that simulate realistic vehicle states (refrigeration, door status, temperatures, coupling). These properties are sent in the telematics payload for each waypoint, enabling testing of sensor-based scenarios.
+Each waypoint in Route-Based simulation can have configurable sensor properties that simulate realistic vehicle states (refrigeration, door status, temperatures, coupling, motion). The system uses an **explicit override approach**: all waypoints use default sensor values (configured in Simulator tab) unless explicitly marked with `hasOverride: true`.
 
-**Configurable Properties** (7 total):
+**Default Sensor Data**:
+- Configured in Simulator tab under "Default Sensor Data" section
+- Applied to all waypoints unless explicitly overridden
+- Saved to localStorage and persists across sessions
+- User can modify defaults at any time
+
+**Configurable Properties** (8 total):
 
 | Property | Type | Range/Values | Default | Payload Field |
 |----------|------|--------------|---------|---------------|
@@ -267,13 +273,12 @@ Each waypoint in Route-Based simulation can have configurable sensor properties 
 | `doorOpen` | boolean | true/false | false | `boxdata.door.BD_DOOR_OPEN` |
 | `doorOpen2` | boolean | true/false | false | `boxdata.door.BD_DOOR_OPEN_2` |
 | `coupled` | boolean | true/false | true | `boxdata.BD_COUPLED` |
+| `isMoving` | boolean | true/false | true | `boxdata.BD_IS_MOVING` |
 
-**UI Implementation** (lines 514-561):
-- Collapsible `<details>` section in waypoint builder: "🔧 Sensor Properties (Optional)"
-- Grouped by category: Refrigeration, Doors, Coupling
-- Checkboxes for boolean values (reefer on/off, doors open/closed, coupled/uncoupled)
-- Number inputs for temperatures with min/max/step validation
-- Form resets to defaults after adding waypoint
+**Override Flag**:
+| Property | Type | Purpose |
+|----------|------|---------|
+| `hasOverride` | boolean | Explicit flag indicating waypoint uses custom sensor values instead of defaults |
 
 **Waypoint Data Structure**:
 ```javascript
@@ -285,97 +290,96 @@ Each waypoint in Route-Based simulation can have configurable sensor properties 
     lon: number,
     speed: number,
     type: string,
-    // Optional sensor properties (backward compatible)
+
+    // Explicit override flag (NEW)
+    hasOverride?: boolean,  // true = use waypoint sensor values, false/undefined = use defaults
+
+    // Sensor properties (only used if hasOverride === true)
     reeferOn?: boolean,
     temp1?: number,
     temp2?: number,
     temp3?: number,
     doorOpen?: boolean,
     doorOpen2?: boolean,
-    coupled?: boolean
+    coupled?: boolean,
+    isMoving?: boolean
 }
 ```
 
-**Display Features**:
-- **Waypoint List** (lines 1106-1131): Shows sensor badges with emoji indicators (❄️ reefer, 🚪 doors, 🌡️ temps, ⚠️ uncoupled)
-- **Route Preview** (lines 1453-1479): Displays sensor status per waypoint with temperature ranges
-- **Smart Display**: Only shows non-default values to keep UI clean
-- **Compact Format**: "❄️ -10°/10°/-2°C • 🚪 Door1+Door2 • ⚠️ Uncoupled"
+**Core sendPing() Logic** (lines ~3469):
+```javascript
+let sensorData;
+if (wp.hasOverride === true) {
+    // Use waypoint override values with fallback to defaults for missing properties
+    sensorData = {
+        reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : state.defaultSensorData.reeferOn,
+        temp1: wp.temp1 !== undefined ? wp.temp1 : state.defaultSensorData.temp1,
+        // ... (all 8 properties)
+    };
+} else {
+    // No override - use defaults entirely
+    sensorData = { ...state.defaultSensorData };
+}
+```
 
-**Payload Integration** (sendPing lines 1518-1541):
-- Extracts sensor properties from current waypoint in route mode
-- Falls back to sensible defaults if properties undefined (backward compatible)
-- Live/Static modes use default sensor values
-- All 7 properties dynamically populate the payload:
-  ```javascript
-  sensorData = {
-      reeferOn: wp.reeferOn !== undefined ? wp.reeferOn : false,
-      temp1: wp.temp1 !== undefined ? wp.temp1 : 20,
-      // ... (fallback pattern for all 7 properties)
-  };
-  ```
+**Waypoint Builder Auto-Detection** (lines ~1461):
+- UI section: "🔧 Sensor Properties (Optional)"
+- When adding waypoint, compares sensor values to `state.defaultSensorData`
+- If ANY value differs from defaults: sets `hasOverride = true` and includes sensor properties
+- If all values match defaults: no sensor properties added, uses defaults
 
-**Predefined Route Scenarios** (lines 821-928):
+**Visual Indicators**:
+Sensor badges appear in 3 locations with consistent styling:
+- **Custom waypoints list** (lines ~1601)
+- **Route preview** (lines ~2553)
+- **GeoJSON expanded view** (lines ~2095)
 
-1. **Copenhagen → Hamburg** (Cold Chain):
-   - Copenhagen Port: Loading (18°C, doors open, reefer starting)
-   - Roskilde: En route (5°C, doors closed, cooling)
-   - Kolding: Optimal temps reached (2°C)
-   - Flensburg: Border crossing (3°C, one door open for inspection)
-   - Kiel/Lübeck: Stable transport (2°C)
-   - Hamburg Port: Unloading (4°C, doors open)
+Badge styles:
+- **No override**: Gray text "⚙️ Using Defaults"
+- **Has override**: Light blue background "🎯 Override: [sensor badges]"
+- Examples: "🎯 Override: ❄️ -10°/5°/0°C • 🚪 Door1 Open • ⚠️ Uncoupled"
 
-2. **Copenhagen → Warsaw** (Non-Refrigerated):
-   - All waypoints: Ambient temperature (20°C), reefer off
-   - Copenhagen: Loading (both doors open)
-   - Stockholm: Rest stop (one door open for inspection)
-   - Warsaw: Unloading (both doors open)
+**Dynamic Button Labels**:
+Edit Sensors buttons change based on override status:
+- **No override**: "➕ Add Override" (creates new override)
+- **Has override**: "✏️ Edit Override" (modifies existing override)
+- **Clear Override button**: Appears only when `hasOverride === true`, reverts waypoint to defaults
 
-3. **Bremen → Munich** (Multi-Zone Refrigeration):
-   - Different temperature zones throughout route
-   - Bremen Port: Loading (-5°/15°/2°C, doors open)
-   - Hannover: Cooling (-8°/12°/0°C)
-   - Frankfurt/Nürnberg: Optimal (-10°/10°/-2°C)
-   - Munich: Unloading (-7°/12°/0°C, doors open)
+**Inline Editing Functions**:
+1. **applyWaypointEdit()** (lines ~2882): Sets `hasOverride = true` when applying sensor changes
+2. **clearWaypointOverride()** (lines ~2925):
+   - Shows confirmation dialog
+   - Removes `hasOverride` flag and all sensor properties
+   - Waypoint reverts to using defaults
 
-**GeoJSON Import Support** (lines 1316-1331):
-- FeatureCollection format supports sensor properties in `properties` field
-- Accepts both camelCase (`reeferOn`, `doorOpen`) and snake_case (`BD_REEFER_ON`, `BD_DOOR_OPEN`)
-- Falls back to defaults if properties not specified
-- Example GeoJSON:
-  ```json
-  {
-    "type": "FeatureCollection",
-    "features": [{
-      "type": "Feature",
-      "properties": {
-        "name": "Port A",
-        "reeferOn": true,
-        "temp1": -5,
-        "doorOpen": true,
-        "coupled": true
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [12.5681, 55.6761]
-      }
-    }]
-  }
-  ```
+**Auto-Migration for Legacy Routes** (lines ~1217):
+- `migrateWaypointOverrides()` function runs on page load
+- Checks waypoints for sensor properties without `hasOverride` flag
+- Sets `hasOverride = true` on waypoints with legacy sensor data
+- Ensures backward compatibility with old saved routes
 
-**Backward Compatibility**:
-- Sensor properties are optional in waypoint objects
-- Existing routes without sensor properties work with defaults
-- No migration required for old saved routes
-- Custom routes created before this feature automatically use defaults
+**GeoJSON Import** (lines ~1825):
+- Detects if GeoJSON features have sensor properties
+- Sets `hasOverride = true` only when sensor properties present
+- Supports both camelCase (`reeferOn`) and snake_case (`BD_REEFER_ON`)
+- Waypoints without sensor properties use defaults
+
+**Predefined Routes** (lines ~1010):
+All three predefined routes now use defaults for all waypoints (no sensor properties):
+
+1. **Copenhagen → Hamburg** (North Sea Corridor): 7 waypoints
+2. **Copenhagen → Warsaw** (Eastern Europe): 6 waypoints
+3. **Bremen → Munich** (Central Europe): 5 waypoints
+
+Users can add overrides to any waypoint via "Add Override" button.
 
 **Use Cases**:
-- Cold chain monitoring simulation (temperature fluctuations)
-- Port operations testing (doors open at loading/unloading)
-- Border crossing scenarios (inspection with door open)
-- Multi-zone refrigerated cargo (different temps per zone)
-- Coupling status monitoring (trailer detachment events)
-- Backend testing with realistic sensor data patterns
+- **Clear defaults vs overrides**: Set baseline sensor values globally, override only where needed
+- **Simplified routes**: Predefined routes use defaults, reducing route definition complexity
+- **Cold chain testing**: Override temperatures at specific waypoints for scenario testing
+- **Port operations**: Override door states at loading/unloading points
+- **Border inspection**: Override door/sensor states at border crossing waypoints
+- **Flexible testing**: Change default values in Simulator tab to instantly affect all non-override waypoints
 
 ### Route Preview Inline Editing
 
