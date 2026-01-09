@@ -474,10 +474,17 @@
                                     <span>Reefer On</span>
                                 </label>
                             </div>
+                            <label style="display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Actual Temperatures</label>
+                            <div class="form-row" style="margin-bottom: var(--space-8);">
+                                <input type="number" id="defaultTemp1" class="form-control" placeholder="Zone 1 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultTemp2" class="form-control" placeholder="Zone 2 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultTemp3" class="form-control" placeholder="Zone 3 (°C)" value="20" min="-30" max="30" step="0.5">
+                            </div>
+                            <label style="display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Setpoint Temperatures</label>
                             <div class="form-row">
-                                <input type="number" id="defaultTemp1" class="form-control" placeholder="Temp Zone 1 (°C)" value="20" min="-30" max="30" step="0.5">
-                                <input type="number" id="defaultTemp2" class="form-control" placeholder="Temp Zone 2 (°C)" value="20" min="-30" max="30" step="0.5">
-                                <input type="number" id="defaultTemp3" class="form-control" placeholder="Temp Zone 3 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultSetpoint1" class="form-control" placeholder="Zone 1 (°C)" value="-18" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultSetpoint2" class="form-control" placeholder="Zone 2 (°C)" value="-18" min="-30" max="30" step="0.5">
+                                <input type="number" id="defaultSetpoint3" class="form-control" placeholder="Zone 3 (°C)" value="-18" min="-30" max="30" step="0.5">
                             </div>
                         </div>
 
@@ -522,6 +529,19 @@
                             ℹ️ These defaults apply to Live GPS and Static modes. In Route mode, waypoint-specific values override these defaults.
                         </p>
                     </details>
+                </div>
+
+                <!-- Payload Logging Control -->
+                <div class="form-group" style="margin-bottom: var(--space-20);">
+                    <label style="display: flex; align-items: center; gap: var(--space-8); cursor: pointer; padding: var(--space-12); background: var(--color-bg-secondary); border-radius: var(--radius-base); border: 1px solid var(--color-border);">
+                        <input type="checkbox" id="logPayloadToConsole" style="width: auto;">
+                        <div>
+                            <span style="font-weight: 600; font-size: 14px;">🔍 Log Payload to Console</span>
+                            <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--color-text-secondary);">
+                                Enable this to log the full JSON payload for each ping to the browser console (F12). Useful for debugging and testing.
+                            </p>
+                        </div>
+                    </label>
                 </div>
 
                 <div class="grid-2" style="margin-bottom: var(--space-20);">
@@ -610,10 +630,17 @@
                                     <span>Reefer On</span>
                                 </label>
                             </div>
+                            <label style="display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Actual Temperatures</label>
+                            <div class="form-row" style="margin-bottom: var(--space-8);">
+                                <input type="number" id="wpTemp1" class="form-control" placeholder="Zone 1 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpTemp2" class="form-control" placeholder="Zone 2 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpTemp3" class="form-control" placeholder="Zone 3 (°C)" value="20" min="-30" max="30" step="0.5">
+                            </div>
+                            <label style="display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Setpoint Temperatures</label>
                             <div class="form-row">
-                                <input type="number" id="wpTemp1" class="form-control" placeholder="Temp Zone 1 (°C)" value="20" min="-30" max="30" step="0.5">
-                                <input type="number" id="wpTemp2" class="form-control" placeholder="Temp Zone 2 (°C)" value="20" min="-30" max="30" step="0.5">
-                                <input type="number" id="wpTemp3" class="form-control" placeholder="Temp Zone 3 (°C)" value="20" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpSetpoint1" class="form-control" placeholder="Zone 1 (°C)" value="-18" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpSetpoint2" class="form-control" placeholder="Zone 2 (°C)" value="-18" min="-30" max="30" step="0.5">
+                                <input type="number" id="wpSetpoint3" class="form-control" placeholder="Zone 3 (°C)" value="-18" min="-30" max="30" step="0.5">
                             </div>
                         </div>
 
@@ -688,6 +715,16 @@
                 <div class="form-group">
                     <label class="form-label">Route Name</label>
                     <input type="text" id="importRouteName" class="form-control" placeholder="Name for imported route">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: var(--space-8); cursor: pointer;">
+                        <input type="checkbox" id="applyDefaultSensors" checked style="width: auto;">
+                        <span style="font-size: 14px;">Apply default sensor properties to waypoints without sensor data</span>
+                    </label>
+                    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0 24px;">
+                        When checked, waypoints without sensor properties in the GeoJSON will use your configured default values. This allows you to see and edit sensor values in the route preview.
+                    </p>
                 </div>
 
                 <div class="btn-group">
@@ -981,6 +1018,9 @@
                 temp1: 20,
                 temp2: 20,
                 temp3: 20,
+                setpoint1: -18,
+                setpoint2: -18,
+                setpoint3: -18,
                 doorOpen: false,
                 doorOpen2: false,
                 coupled: true,
@@ -1218,6 +1258,9 @@
                 document.getElementById('defaultTemp1').value = state.defaultSensorData.temp1;
                 document.getElementById('defaultTemp2').value = state.defaultSensorData.temp2;
                 document.getElementById('defaultTemp3').value = state.defaultSensorData.temp3;
+                document.getElementById('defaultSetpoint1').value = state.defaultSensorData.setpoint1 !== undefined ? state.defaultSensorData.setpoint1 : -18;
+                document.getElementById('defaultSetpoint2').value = state.defaultSensorData.setpoint2 !== undefined ? state.defaultSensorData.setpoint2 : -18;
+                document.getElementById('defaultSetpoint3').value = state.defaultSensorData.setpoint3 !== undefined ? state.defaultSensorData.setpoint3 : -18;
                 document.getElementById('defaultDoorOpen').checked = state.defaultSensorData.doorOpen;
                 document.getElementById('defaultDoorOpen2').checked = state.defaultSensorData.doorOpen2;
                 document.getElementById('defaultCoupled').checked = state.defaultSensorData.coupled;
@@ -1326,6 +1369,9 @@
                 temp1: parseFloat(document.getElementById('defaultTemp1').value) || 20,
                 temp2: parseFloat(document.getElementById('defaultTemp2').value) || 20,
                 temp3: parseFloat(document.getElementById('defaultTemp3').value) || 20,
+                setpoint1: parseFloat(document.getElementById('defaultSetpoint1').value) || -18,
+                setpoint2: parseFloat(document.getElementById('defaultSetpoint2').value) || -18,
+                setpoint3: parseFloat(document.getElementById('defaultSetpoint3').value) || -18,
                 doorOpen: document.getElementById('defaultDoorOpen').checked,
                 doorOpen2: document.getElementById('defaultDoorOpen2').checked,
                 coupled: document.getElementById('defaultCoupled').checked,
@@ -1395,6 +1441,9 @@
             const temp1 = parseFloat(document.getElementById('wpTemp1').value) || 20;
             const temp2 = parseFloat(document.getElementById('wpTemp2').value) || 20;
             const temp3 = parseFloat(document.getElementById('wpTemp3').value) || 20;
+            const setpoint1 = parseFloat(document.getElementById('wpSetpoint1').value) || -18;
+            const setpoint2 = parseFloat(document.getElementById('wpSetpoint2').value) || -18;
+            const setpoint3 = parseFloat(document.getElementById('wpSetpoint3').value) || -18;
             const doorOpen = document.getElementById('wpDoorOpen').checked;
             const doorOpen2 = document.getElementById('wpDoorOpen2').checked;
             const coupled = document.getElementById('wpCoupled').checked;
@@ -1437,6 +1486,9 @@
                 temp1 !== state.defaultSensorData.temp1 ||
                 temp2 !== state.defaultSensorData.temp2 ||
                 temp3 !== state.defaultSensorData.temp3 ||
+                setpoint1 !== state.defaultSensorData.setpoint1 ||
+                setpoint2 !== state.defaultSensorData.setpoint2 ||
+                setpoint3 !== state.defaultSensorData.setpoint3 ||
                 doorOpen !== state.defaultSensorData.doorOpen ||
                 doorOpen2 !== state.defaultSensorData.doorOpen2 ||
                 coupled !== state.defaultSensorData.coupled ||
@@ -1459,6 +1511,9 @@
                 newWaypoint.temp1 = temp1;
                 newWaypoint.temp2 = temp2;
                 newWaypoint.temp3 = temp3;
+                newWaypoint.setpoint1 = setpoint1;
+                newWaypoint.setpoint2 = setpoint2;
+                newWaypoint.setpoint3 = setpoint3;
                 newWaypoint.doorOpen = doorOpen;
                 newWaypoint.doorOpen2 = doorOpen2;
                 newWaypoint.coupled = coupled;
@@ -1700,10 +1755,11 @@
         function importGeoJSON() {
             let json = document.getElementById('geojsonInput').value.trim();
             const name = document.getElementById('importRouteName').value.trim();
-            
+            const applyDefaults = document.getElementById('applyDefaultSensors').checked;
+
             const geojsonInput = document.getElementById('geojsonInput');
             const importRouteName = document.getElementById('importRouteName');
-            
+
             // Clear previous validation
             geojsonInput.style.borderColor = '';
             importRouteName.style.borderColor = '';
@@ -1743,15 +1799,35 @@
 
                 // Handle array of {latitude, longitude} objects
                 if (Array.isArray(data) && data.length > 0 && data[0].latitude !== undefined && data[0].longitude !== undefined) {
-                    waypoints = data.map((point, idx) => ({
-                        name: `Waypoint ${idx + 1}`,
-                        city: '',
-                        country: 'Unknown',
-                        lat: point.latitude,
-                        lon: point.longitude,
-                        speed: 30,
-                        type: 'Waypoint'
-                    }));
+                    waypoints = data.map((point, idx) => {
+                        const waypoint = {
+                            name: `Waypoint ${idx + 1}`,
+                            city: '',
+                            country: 'Unknown',
+                            lat: point.latitude,
+                            lon: point.longitude,
+                            speed: 30,
+                            type: 'Waypoint'
+                        };
+
+                        // Apply default sensor properties if checkbox is checked
+                        if (applyDefaults) {
+                            waypoint.hasOverride = true;
+                            waypoint.reeferOn = state.defaultSensorData.reeferOn;
+                            waypoint.temp1 = state.defaultSensorData.temp1;
+                            waypoint.temp2 = state.defaultSensorData.temp2;
+                            waypoint.temp3 = state.defaultSensorData.temp3;
+                            waypoint.setpoint1 = state.defaultSensorData.setpoint1;
+                            waypoint.setpoint2 = state.defaultSensorData.setpoint2;
+                            waypoint.setpoint3 = state.defaultSensorData.setpoint3;
+                            waypoint.doorOpen = state.defaultSensorData.doorOpen;
+                            waypoint.doorOpen2 = state.defaultSensorData.doorOpen2;
+                            waypoint.coupled = state.defaultSensorData.coupled;
+                            waypoint.isMoving = state.defaultSensorData.isMoving;
+                        }
+
+                        return waypoint;
+                    });
                 }
                 // Handle FeatureCollection (Point geometries)
                 else if (data.type === 'FeatureCollection' && data.features) {
@@ -1764,6 +1840,9 @@
                             props.temp1 !== undefined || props.BD_TEMP1 !== undefined ||
                             props.temp2 !== undefined || props.BD_TEMP2 !== undefined ||
                             props.temp3 !== undefined || props.BD_TEMP3 !== undefined ||
+                            props.setpoint1 !== undefined || props.BD_REEFER_SETPOINT_1 !== undefined ||
+                            props.setpoint2 !== undefined || props.BD_REEFER_SETPOINT_2 !== undefined ||
+                            props.setpoint3 !== undefined || props.BD_REEFER_SETPOINT_3 !== undefined ||
                             props.doorOpen !== undefined || props.BD_DOOR_OPEN !== undefined ||
                             props.doorOpen2 !== undefined || props.BD_DOOR_OPEN_2 !== undefined ||
                             props.coupled !== undefined || props.BD_COUPLED !== undefined ||
@@ -1779,8 +1858,9 @@
                             type: props.type || 'Waypoint'
                         };
 
-                        // Only add sensor properties if they exist in GeoJSON
+                        // Add sensor properties from GeoJSON or apply defaults
                         if (hasSensorProps) {
+                            // GeoJSON has sensor properties - use them
                             waypoint.hasOverride = true;
                             waypoint.reeferOn = props.reeferOn !== undefined ? props.reeferOn :
                                               (props.BD_REEFER_ON !== undefined ? props.BD_REEFER_ON : false);
@@ -1790,6 +1870,12 @@
                                            (props.BD_TEMP2 !== undefined ? props.BD_TEMP2 : 0);
                             waypoint.temp3 = props.temp3 !== undefined ? props.temp3 :
                                            (props.BD_TEMP3 !== undefined ? props.BD_TEMP3 : 0);
+                            waypoint.setpoint1 = props.setpoint1 !== undefined ? props.setpoint1 :
+                                               (props.BD_REEFER_SETPOINT_1 !== undefined ? props.BD_REEFER_SETPOINT_1 : -18);
+                            waypoint.setpoint2 = props.setpoint2 !== undefined ? props.setpoint2 :
+                                               (props.BD_REEFER_SETPOINT_2 !== undefined ? props.BD_REEFER_SETPOINT_2 : -18);
+                            waypoint.setpoint3 = props.setpoint3 !== undefined ? props.setpoint3 :
+                                               (props.BD_REEFER_SETPOINT_3 !== undefined ? props.BD_REEFER_SETPOINT_3 : -18);
                             waypoint.doorOpen = props.doorOpen !== undefined ? props.doorOpen :
                                               (props.BD_DOOR_OPEN !== undefined ? props.BD_DOOR_OPEN : false);
                             waypoint.doorOpen2 = props.doorOpen2 !== undefined ? props.doorOpen2 :
@@ -1798,6 +1884,20 @@
                                              (props.BD_COUPLED !== undefined ? props.BD_COUPLED : true);
                             waypoint.isMoving = props.isMoving !== undefined ? props.isMoving :
                                               (props.BD_IS_MOVING !== undefined ? props.BD_IS_MOVING : true);
+                        } else if (applyDefaults) {
+                            // No sensor properties in GeoJSON - apply configured defaults
+                            waypoint.hasOverride = true;
+                            waypoint.reeferOn = state.defaultSensorData.reeferOn;
+                            waypoint.temp1 = state.defaultSensorData.temp1;
+                            waypoint.temp2 = state.defaultSensorData.temp2;
+                            waypoint.temp3 = state.defaultSensorData.temp3;
+                            waypoint.setpoint1 = state.defaultSensorData.setpoint1;
+                            waypoint.setpoint2 = state.defaultSensorData.setpoint2;
+                            waypoint.setpoint3 = state.defaultSensorData.setpoint3;
+                            waypoint.doorOpen = state.defaultSensorData.doorOpen;
+                            waypoint.doorOpen2 = state.defaultSensorData.doorOpen2;
+                            waypoint.coupled = state.defaultSensorData.coupled;
+                            waypoint.isMoving = state.defaultSensorData.isMoving;
                         }
 
                         return waypoint;
@@ -1805,27 +1905,67 @@
                 }
                 // Handle LineString geometry (direct object)
                 else if (data.type === 'LineString' && Array.isArray(data.coordinates)) {
-                    waypoints = data.coordinates.map((coord, idx) => ({
-                        name: `Waypoint ${idx + 1}`,
-                        city: '',
-                        country: 'Unknown',
-                        lat: coord[1],  // GeoJSON uses [lon, lat]
-                        lon: coord[0],
-                        speed: 30,
-                        type: 'Waypoint'
-                    }));
+                    waypoints = data.coordinates.map((coord, idx) => {
+                        const waypoint = {
+                            name: `Waypoint ${idx + 1}`,
+                            city: '',
+                            country: 'Unknown',
+                            lat: coord[1],  // GeoJSON uses [lon, lat]
+                            lon: coord[0],
+                            speed: 30,
+                            type: 'Waypoint'
+                        };
+
+                        // Apply default sensor properties if checkbox is checked
+                        if (applyDefaults) {
+                            waypoint.hasOverride = true;
+                            waypoint.reeferOn = state.defaultSensorData.reeferOn;
+                            waypoint.temp1 = state.defaultSensorData.temp1;
+                            waypoint.temp2 = state.defaultSensorData.temp2;
+                            waypoint.temp3 = state.defaultSensorData.temp3;
+                            waypoint.setpoint1 = state.defaultSensorData.setpoint1;
+                            waypoint.setpoint2 = state.defaultSensorData.setpoint2;
+                            waypoint.setpoint3 = state.defaultSensorData.setpoint3;
+                            waypoint.doorOpen = state.defaultSensorData.doorOpen;
+                            waypoint.doorOpen2 = state.defaultSensorData.doorOpen2;
+                            waypoint.coupled = state.defaultSensorData.coupled;
+                            waypoint.isMoving = state.defaultSensorData.isMoving;
+                        }
+
+                        return waypoint;
+                    });
                 }
                 // Handle single Feature with LineString
                 else if (data.type === 'Feature' && data.geometry?.type === 'LineString') {
-                    waypoints = data.geometry.coordinates.map((coord, idx) => ({
-                        name: `Waypoint ${idx + 1}`,
-                        city: '',
-                        country: 'Unknown',
-                        lat: coord[1],
-                        lon: coord[0],
-                        speed: 30,
-                        type: 'Waypoint'
-                    }));
+                    waypoints = data.geometry.coordinates.map((coord, idx) => {
+                        const waypoint = {
+                            name: `Waypoint ${idx + 1}`,
+                            city: '',
+                            country: 'Unknown',
+                            lat: coord[1],
+                            lon: coord[0],
+                            speed: 30,
+                            type: 'Waypoint'
+                        };
+
+                        // Apply default sensor properties if checkbox is checked
+                        if (applyDefaults) {
+                            waypoint.hasOverride = true;
+                            waypoint.reeferOn = state.defaultSensorData.reeferOn;
+                            waypoint.temp1 = state.defaultSensorData.temp1;
+                            waypoint.temp2 = state.defaultSensorData.temp2;
+                            waypoint.temp3 = state.defaultSensorData.temp3;
+                            waypoint.setpoint1 = state.defaultSensorData.setpoint1;
+                            waypoint.setpoint2 = state.defaultSensorData.setpoint2;
+                            waypoint.setpoint3 = state.defaultSensorData.setpoint3;
+                            waypoint.doorOpen = state.defaultSensorData.doorOpen;
+                            waypoint.doorOpen2 = state.defaultSensorData.doorOpen2;
+                            waypoint.coupled = state.defaultSensorData.coupled;
+                            waypoint.isMoving = state.defaultSensorData.isMoving;
+                        }
+
+                        return waypoint;
+                    });
                 }
                 else {
                     geojsonInput.style.borderColor = 'var(--color-error)';
@@ -1855,7 +1995,8 @@
                     renderGeoJSONRoutes();
                 }
 
-                addLog(`✓ Imported "${name}" with ${waypoints.length} waypoints`, 'success');
+                const sensorMsg = applyDefaults ? ' (default sensor properties applied)' : '';
+                addLog(`✓ Imported "${name}" with ${waypoints.length} waypoints${sensorMsg}`, 'success');
                 document.getElementById('geojsonInput').value = '';
                 document.getElementById('importRouteName').value = '';
             } catch (e) {
@@ -2047,10 +2188,17 @@
                                 <input type="checkbox" id="insert-reeferOn--1" style="width: auto;">
                                 <span>Reefer On</span>
                             </label>
+                            <label style="display: block; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px;">Actual Temps</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 4px;">
+                                <input type="number" id="insert-temp1--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z1">
+                                <input type="number" id="insert-temp2--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z2">
+                                <input type="number" id="insert-temp3--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z3">
+                            </div>
+                            <label style="display: block; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px;">Setpoints</label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
-                                <input type="number" id="insert-temp1--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T1">
-                                <input type="number" id="insert-temp2--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T2">
-                                <input type="number" id="insert-temp3--1" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T3">
+                                <input type="number" id="insert-setpoint1--1" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z1">
+                                <input type="number" id="insert-setpoint2--1" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z2">
+                                <input type="number" id="insert-setpoint3--1" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z3">
                             </div>
                             <!-- Doors -->
                             <div style="display: flex; gap: 12px; margin-bottom: 8px;">
@@ -2121,10 +2269,17 @@
                                 <span>Reefer On</span>
                             </label>
                         </div>
+                        <label style="display: block; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">Actual Temperatures</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <input type="number" id="edit-temp1-${i}" value="${wp.temp1 !== undefined ? wp.temp1 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 1">
+                            <input type="number" id="edit-temp2-${i}" value="${wp.temp2 !== undefined ? wp.temp2 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 2">
+                            <input type="number" id="edit-temp3-${i}" value="${wp.temp3 !== undefined ? wp.temp3 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 3">
+                        </div>
+                        <label style="display: block; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">Setpoint Temperatures</label>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                            <input type="number" id="edit-temp1-${i}" value="${wp.temp1 !== undefined ? wp.temp1 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 1">
-                            <input type="number" id="edit-temp2-${i}" value="${wp.temp2 !== undefined ? wp.temp2 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 2">
-                            <input type="number" id="edit-temp3-${i}" value="${wp.temp3 !== undefined ? wp.temp3 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 3">
+                            <input type="number" id="edit-setpoint1-${i}" value="${wp.setpoint1 !== undefined ? wp.setpoint1 : -18}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 1">
+                            <input type="number" id="edit-setpoint2-${i}" value="${wp.setpoint2 !== undefined ? wp.setpoint2 : -18}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 2">
+                            <input type="number" id="edit-setpoint3-${i}" value="${wp.setpoint3 !== undefined ? wp.setpoint3 : -18}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 3">
                         </div>
 
                         <!-- Doors Section -->
@@ -2191,10 +2346,17 @@
                                     <input type="checkbox" id="insert-reeferOn-${i}" style="width: auto;">
                                     <span>Reefer On</span>
                                 </label>
+                                <label style="display: block; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px;">Actual Temps</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 4px;">
+                                    <input type="number" id="insert-temp1-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z1">
+                                    <input type="number" id="insert-temp2-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z2">
+                                    <input type="number" id="insert-temp3-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z3">
+                                </div>
+                                <label style="display: block; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px;">Setpoints</label>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
-                                    <input type="number" id="insert-temp1-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T1">
-                                    <input type="number" id="insert-temp2-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T2">
-                                    <input type="number" id="insert-temp3-${i}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T3">
+                                    <input type="number" id="insert-setpoint1-${i}" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z1">
+                                    <input type="number" id="insert-setpoint2-${i}" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z2">
+                                    <input type="number" id="insert-setpoint3-${i}" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z3">
                                 </div>
                                 <!-- Doors -->
                                 <div style="display: flex; gap: 12px; margin-bottom: 8px;">
@@ -2721,10 +2883,17 @@
                             <span>Reefer On</span>
                         </label>
                     </div>
+                    <label style="display: block; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">Actual Temperatures</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="number" id="edit-temp1-${i}" value="${wp.temp1 !== undefined ? wp.temp1 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 1">
+                        <input type="number" id="edit-temp2-${i}" value="${wp.temp2 !== undefined ? wp.temp2 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 2">
+                        <input type="number" id="edit-temp3-${i}" value="${wp.temp3 !== undefined ? wp.temp3 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 3">
+                    </div>
+                    <label style="display: block; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">Setpoint Temperatures</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                        <input type="number" id="edit-temp1-${i}" value="${wp.temp1 !== undefined ? wp.temp1 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 1">
-                        <input type="number" id="edit-temp2-${i}" value="${wp.temp2 !== undefined ? wp.temp2 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 2">
-                        <input type="number" id="edit-temp3-${i}" value="${wp.temp3 !== undefined ? wp.temp3 : 20}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Temp 3">
+                        <input type="number" id="edit-setpoint1-${i}" value="${wp.setpoint1 !== undefined ? wp.setpoint1 : -18}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 1">
+                        <input type="number" id="edit-setpoint2-${i}" value="${wp.setpoint2 !== undefined ? wp.setpoint2 : -18}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 2">
+                        <input type="number" id="edit-setpoint3-${i}" value="${wp.setpoint3 !== undefined ? wp.setpoint3 : -18}" min="-30" max="30" step="0.5" class="form-control" style="padding: 6px; font-size: 12px;" placeholder="Zone 3">
                     </div>
 
                     <div style="display: flex; gap: 16px; margin-bottom: 12px;">
@@ -2787,10 +2956,17 @@
                                 <input type="checkbox" id="insert-reeferOn-${afterIdx}" style="width: auto;">
                                 <span>Reefer On</span>
                             </label>
+                            <label style="display: block; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px;">Actual Temps</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 4px;">
+                                <input type="number" id="insert-temp1-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z1">
+                                <input type="number" id="insert-temp2-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z2">
+                                <input type="number" id="insert-temp3-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z3">
+                            </div>
+                            <label style="display: block; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px;">Setpoints</label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
-                                <input type="number" id="insert-temp1-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T1">
-                                <input type="number" id="insert-temp2-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T2">
-                                <input type="number" id="insert-temp3-${afterIdx}" value="20" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="T3">
+                                <input type="number" id="insert-setpoint1-${afterIdx}" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z1">
+                                <input type="number" id="insert-setpoint2-${afterIdx}" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z2">
+                                <input type="number" id="insert-setpoint3-${afterIdx}" value="-18" min="-30" max="30" step="0.5" class="form-control" style="padding: 4px; font-size: 11px;" placeholder="Z3">
                             </div>
                             <div style="display: flex; gap: 12px; margin-bottom: 8px;">
                                 <label style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
@@ -2903,6 +3079,9 @@
             wp.temp1 = parseFloat(document.getElementById(`edit-temp1-${waypointIdx}`).value) || 20;
             wp.temp2 = parseFloat(document.getElementById(`edit-temp2-${waypointIdx}`).value) || 20;
             wp.temp3 = parseFloat(document.getElementById(`edit-temp3-${waypointIdx}`).value) || 20;
+            wp.setpoint1 = parseFloat(document.getElementById(`edit-setpoint1-${waypointIdx}`).value) || -18;
+            wp.setpoint2 = parseFloat(document.getElementById(`edit-setpoint2-${waypointIdx}`).value) || -18;
+            wp.setpoint3 = parseFloat(document.getElementById(`edit-setpoint3-${waypointIdx}`).value) || -18;
             wp.doorOpen = document.getElementById(`edit-doorOpen-${waypointIdx}`).checked;
             wp.doorOpen2 = document.getElementById(`edit-doorOpen2-${waypointIdx}`).checked;
             wp.coupled = document.getElementById(`edit-coupled-${waypointIdx}`).checked;
@@ -3241,24 +3420,30 @@
             }
 
             // Read sensor properties with error handling
-            let reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled, isMoving;
+            let reeferOn, temp1, temp2, temp3, setpoint1, setpoint2, setpoint3, doorOpen, doorOpen2, coupled, isMoving;
             try {
                 const reeferOnEl = document.getElementById(`insert-reeferOn-${afterIdx}`);
                 const temp1El = document.getElementById(`insert-temp1-${afterIdx}`);
                 const temp2El = document.getElementById(`insert-temp2-${afterIdx}`);
                 const temp3El = document.getElementById(`insert-temp3-${afterIdx}`);
+                const setpoint1El = document.getElementById(`insert-setpoint1-${afterIdx}`);
+                const setpoint2El = document.getElementById(`insert-setpoint2-${afterIdx}`);
+                const setpoint3El = document.getElementById(`insert-setpoint3-${afterIdx}`);
                 const doorOpenEl = document.getElementById(`insert-doorOpen-${afterIdx}`);
                 const doorOpen2El = document.getElementById(`insert-doorOpen2-${afterIdx}`);
                 const coupledEl = document.getElementById(`insert-coupled-${afterIdx}`);
                 const isMovingEl = document.getElementById(`insert-isMoving-${afterIdx}`);
 
-                if (!reeferOnEl || !temp1El || !temp2El || !temp3El || !doorOpenEl || !doorOpen2El || !coupledEl || !isMovingEl) {
+                if (!reeferOnEl || !temp1El || !temp2El || !temp3El || !setpoint1El || !setpoint2El || !setpoint3El || !doorOpenEl || !doorOpen2El || !coupledEl || !isMovingEl) {
                     console.warn(`Sensor form elements not found for index ${afterIdx}. Using defaults.`);
                     console.warn('Expected IDs:', {
                         reeferOn: `insert-reeferOn-${afterIdx}`,
                         temp1: `insert-temp1-${afterIdx}`,
                         temp2: `insert-temp2-${afterIdx}`,
                         temp3: `insert-temp3-${afterIdx}`,
+                        setpoint1: `insert-setpoint1-${afterIdx}`,
+                        setpoint2: `insert-setpoint2-${afterIdx}`,
+                        setpoint3: `insert-setpoint3-${afterIdx}`,
                         doorOpen: `insert-doorOpen-${afterIdx}`,
                         doorOpen2: `insert-doorOpen2-${afterIdx}`,
                         coupled: `insert-coupled-${afterIdx}`,
@@ -3271,13 +3456,16 @@
                 temp1 = parseFloat(temp1El.value) || 20;
                 temp2 = parseFloat(temp2El.value) || 20;
                 temp3 = parseFloat(temp3El.value) || 20;
+                setpoint1 = parseFloat(setpoint1El.value) || -18;
+                setpoint2 = parseFloat(setpoint2El.value) || -18;
+                setpoint3 = parseFloat(setpoint3El.value) || -18;
                 doorOpen = doorOpenEl.checked;
                 doorOpen2 = doorOpen2El.checked;
                 coupled = coupledEl.checked;
                 isMoving = isMovingEl.checked;
 
                 console.log(`Successfully read sensor properties for index ${afterIdx}:`, {
-                    reeferOn, temp1, temp2, temp3, doorOpen, doorOpen2, coupled, isMoving
+                    reeferOn, temp1, temp2, temp3, setpoint1, setpoint2, setpoint3, doorOpen, doorOpen2, coupled, isMoving
                 });
             } catch (error) {
                 console.error('Error reading sensor properties:', error);
@@ -3287,6 +3475,9 @@
                 temp1 = 20;
                 temp2 = 20;
                 temp3 = 20;
+                setpoint1 = -18;
+                setpoint2 = -18;
+                setpoint3 = -18;
                 doorOpen = false;
                 doorOpen2 = false;
                 coupled = true;
@@ -3334,6 +3525,9 @@
                 temp1,
                 temp2,
                 temp3,
+                setpoint1,
+                setpoint2,
+                setpoint3,
                 doorOpen,
                 doorOpen2,
                 coupled,
@@ -3590,6 +3784,9 @@
                         temp1: wp.temp1 !== undefined ? wp.temp1 : state.defaultSensorData.temp1,
                         temp2: wp.temp2 !== undefined ? wp.temp2 : state.defaultSensorData.temp2,
                         temp3: wp.temp3 !== undefined ? wp.temp3 : state.defaultSensorData.temp3,
+                        setpoint1: wp.setpoint1 !== undefined ? wp.setpoint1 : state.defaultSensorData.setpoint1,
+                        setpoint2: wp.setpoint2 !== undefined ? wp.setpoint2 : state.defaultSensorData.setpoint2,
+                        setpoint3: wp.setpoint3 !== undefined ? wp.setpoint3 : state.defaultSensorData.setpoint3,
                         doorOpen: wp.doorOpen !== undefined ? wp.doorOpen : state.defaultSensorData.doorOpen,
                         doorOpen2: wp.doorOpen2 !== undefined ? wp.doorOpen2 : state.defaultSensorData.doorOpen2,
                         coupled: wp.coupled !== undefined ? wp.coupled : state.defaultSensorData.coupled,
@@ -3661,7 +3858,10 @@
                             BD_REEFER_COOLANT_OK: true,
                             BD_TEMP1: sensorData.temp1,
                             BD_TEMP2: sensorData.temp2,
-                            BD_TEMP3: sensorData.temp3
+                            BD_TEMP3: sensorData.temp3,
+                            BD_REEFER_SETPOINT_1: sensorData.setpoint1,
+                            BD_REEFER_SETPOINT_2: sensorData.setpoint2,
+                            BD_REEFER_SETPOINT_3: sensorData.setpoint3
                         },
                         batteryPack: {
                             BD_BATTERY_PACK_STATE_OF_CHARGE: 100,
@@ -3675,6 +3875,17 @@
                     }
                 }
             };
+
+            // Log payload to console if enabled
+            if (document.getElementById('logPayloadToConsole')?.checked) {
+                console.group(`📤 Ping #${state.pingCount + 1} Payload - ${locName}`);
+                console.log('Timestamp:', new Date().toISOString());
+                console.log('Vehicle:', vehicle.assetName || vehicle.vhId);
+                console.log('Mode:', state.simMode);
+                console.log('Payload:', payload);
+                console.log('JSON:', JSON.stringify(payload, null, 2));
+                console.groupEnd();
+            }
 
             fetch(state.backendUrl, {
                 method: 'POST',
